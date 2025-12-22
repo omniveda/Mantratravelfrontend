@@ -1,0 +1,48 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-hide {
+  scrollbar-width: none;
+}
+
+.nature-text {
+  font-size: 120px;
+  font-weight: 900;
+  font-family: 'Arial Black', 'Poppins', sans-serif;
+  letter-spacing: 4px;
+
+  color: #6a00ff; /* inner fill (purple-ish) */
+
+  /* Thick yellow outline */
+  -webkit-text-stroke: 6px #ffd84d;
+
+  /* Glow / depth */
+  text-shadow:
+    0 0 10px rgba(255, 216, 77, 0.8),
+    0 0 20px rgba(255, 0, 255, 0.6),
+    0 0 40px rgba(128, 0, 255, 0.6);
+
+  text-transform: uppercase;
+}
+
+@keyframes glow {
+  0% { text-shadow: 0 0 10px #ffd84d; }
+  50% { text-shadow: 0 0 30px #ff00ff; }
+  100% { text-shadow: 0 0 10px #ffd84d; }
+}
+
+.nature-text {
+  animation: glow 2s infinite ease-in-out;
+}
