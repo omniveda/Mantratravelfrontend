@@ -34,7 +34,7 @@ export default function News() {
     useEffect(() => {
         const fetchNews = async () => {
             try {
-                const res = await axios.get("/api/news");
+                const res = await axios.get("https://mantratravelbackend.onrender.com/api/news");
                 const allNews = res.data;
 
                 // Segregate news based on category or fallback logic

@@ -13,7 +13,7 @@ export default function Culture() {
     useEffect(() => {
         const fetchBlogs = async () => {
             try {
-                const res = await axios.get('/api/blogs?tag=culture');
+                const res = await axios.get('https://mantratravelbackend.onrender.com/api/blogs?tag=culture');
                 setBlogs(res.data);
             } catch (err) {
                 console.error("Error fetching nature blogs", err);
@@ -27,7 +27,7 @@ export default function Culture() {
     useEffect(() => {
         const fetchExploreBlogs = async () => {
             try {
-                const res = await axios.get('/api/blogs?tag=exploreculture');
+                const res = await axios.get('https://mantratravelbackend.onrender.com/api/blogs?tag=exploreculture');
                 setExploreBlog(res.data);
             } catch (err) {
                 console.error("Error fetching nature blogs", err);

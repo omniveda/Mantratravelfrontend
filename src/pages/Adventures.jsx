@@ -13,7 +13,7 @@ export default function Adventures() {
     useEffect(() => {
         const fetchBlogs = async () => {
             try {
-                const res = await axios.get('/api/blogs?tag=adventures');
+                const res = await axios.get('https://mantratravelbackend.onrender.com/api/blogs?tag=adventures');
                 setBlogs(res.data);
             } catch (err) {
                 console.error("Error fetching nature blogs", err);
@@ -27,7 +27,7 @@ export default function Adventures() {
     useEffect(() => {
         const fetchExploreBlogs = async () => {
             try {
-                const res = await axios.get('/api/blogs?tag=exploreadventures');
+                const res = await axios.get('https://mantratravelbackend.onrender.com/api/blogs?tag=exploreadventures');
                 setExploreBlog(res.data);
             } catch (err) {
                 console.error("Error fetching nature blogs", err);

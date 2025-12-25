@@ -13,7 +13,7 @@ export default function Heritage() {
     useEffect(() => {
         const fetchBlogs = async () => {
             try {
-                const res = await axios.get('/api/blogs?tag=heritage');
+                const res = await axios.get('https://mantratravelbackend.onrender.com/api/blogs?tag=heritage');
                 setBlogs(res.data);
             } catch (err) {
                 console.error("Error fetching nature blogs", err);
@@ -27,7 +27,7 @@ export default function Heritage() {
     useEffect(() => {
         const fetchExploreBlogs = async () => {
             try {
-                const res = await axios.get('/api/blogs?tag=exploreheritage');
+                const res = await axios.get('https://mantratravelbackend.onrender.com/api/blogs?tag=exploreheritage');
                 setExploreBlog(res.data);
             } catch (err) {
                 console.error("Error fetching nature blogs", err);
