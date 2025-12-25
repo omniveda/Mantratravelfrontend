@@ -69,8 +69,8 @@ export default function Blog() {
                                     key={index}
                                     onClick={() => handleNavClick(item)}
                                     className={`transition-colors pb-1 ${isActive
-                                            ? "text-blue-600 border-b-2 border-blue-600"
-                                            : "hover:text-gray-600"
+                                        ? "text-blue-600 border-b-2 border-blue-600"
+                                        : "hover:text-gray-600"
                                         }`}
                                 >
                                     {item.title}
@@ -96,7 +96,11 @@ export default function Blog() {
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
                     {blogs.map((blog) => (
-                        <div key={blog._id} className="bg-white rounded-xl shadow-sm hover:shadow-lg transition-transform hover:-translate-y-1 overflow-hidden cursor-pointer group">
+                        <div
+                            key={blog._id}
+                            onClick={() => navigate(`/blog/${blog._id}`)}
+                            className="bg-white rounded-xl shadow-sm hover:shadow-lg transition-transform hover:-translate-y-1 overflow-hidden cursor-pointer group"
+                        >
                             <div className="h-48 overflow-hidden">
                                 <img
                                     src={blog.image || "https://via.placeholder.com/400x250"}
@@ -109,8 +113,10 @@ export default function Blog() {
                                     {blog.heading}
                                 </h3>
                             </div>
-                            <div className="bg-blue-500 py-2 text-center">
-                                <span className="text-white font-bold uppercase tracking-widest text-sm">BLOGS</span>
+                            <div className="bg-blue-500 py-2 text-center group-hover:bg-blue-600 transition-colors">
+                                <span className="text-white font-bold uppercase tracking-widest text-sm flex items-center justify-center gap-2">
+                                    Read More <span>→</span>
+                                </span>
                             </div>
                         </div>
                     ))}

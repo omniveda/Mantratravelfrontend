@@ -7,7 +7,7 @@ import { FaHeart, FaBookmark, FaComment } from 'react-icons/fa';
 export default function Adventures() {
     const navigate = useNavigate();
     const [blogs, setBlogs] = useState([]);
-    const[exploreBlog,setExploreBlog]=useState([]);
+    const [exploreBlog, setExploreBlog] = useState([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -134,7 +134,10 @@ export default function Adventures() {
                                 <p className="text-gray-300 text-lg leading-relaxed mb-6 line-clamp-3">
                                     {blog.description}
                                 </p>
-                                <button className="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-6 rounded text-sm tracking-wider transition-colors uppercase">
+                                <button
+                                    onClick={() => navigate(`/blog/${blog._id}`)}
+                                    className="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-6 rounded text-sm tracking-wider transition-colors uppercase"
+                                >
                                     Read More
                                 </button>
                                 <div className="border-b border-gray-700 mt-10"></div>
@@ -147,62 +150,65 @@ export default function Adventures() {
             </div>
 
             <div className='bg-white py-16 px-6 relative'>
-                 <h2 className="text-center text-4xl font-bold tracking-widest mb-12">
-        RELATED BLOGS
-      </h2>
+                <h2 className="text-center text-4xl font-bold tracking-widest mb-12">
+                    RELATED BLOGS
+                </h2>
 
-      {/* Arrows */}
-      <button className="absolute left-6 top-1/2 -translate-y-1/2 w-10 h-10 bg-white shadow rounded-full flex items-center justify-center">
-        ←
-      </button>
+                {/* Arrows */}
+                <button className="absolute left-6 top-1/2 -translate-y-1/2 w-10 h-10 bg-white shadow rounded-full flex items-center justify-center">
+                    ←
+                </button>
 
-      <button className="absolute right-6 top-1/2 -translate-y-1/2 w-10 h-10 bg-white shadow rounded-full flex items-center justify-center">
-        →
-      </button>
+                <button className="absolute right-6 top-1/2 -translate-y-1/2 w-10 h-10 bg-white shadow rounded-full flex items-center justify-center">
+                    →
+                </button>
 
-      {/* Blog Cards */}
-      <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-10">
+                {/* Blog Cards */}
+                <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-10">
 
-        {exploreBlog.map((blog) => (
-          <div key={blog.id} className="relative">
+                    {exploreBlog.map((blog) => (
+                        <div key={blog.id} className="relative">
 
-            {/* Image */}
-            <img
-              src={blog.image}
-              alt={blog.title}
-              className="w-full h-[350px] object-cover"
-            />
+                            {/* Image */}
+                            <img
+                                src={blog.image}
+                                alt={blog.title}
+                                className="w-full h-[350px] object-cover"
+                            />
 
-            {/* Overlay (only if exists) */}
-            {blog.overlayText && (
-              <div className="absolute inset-0 bg-black/40 flex items-center p-6">
-                <h3 className="text-white text-xl font-bold leading-snug">
-                  {blog.overlayText}
-                </h3>
-              </div>
-            )}
+                            {/* Overlay (only if exists) */}
+                            {blog.overlayText && (
+                                <div className="absolute inset-0 bg-black/40 flex items-center p-6">
+                                    <h3 className="text-white text-xl font-bold leading-snug">
+                                        {blog.overlayText}
+                                    </h3>
+                                </div>
+                            )}
 
-            {/* Content */}
-            <h3 className="text-xl font-bold mt-4">{blog.title}</h3>
+                            {/* Content */}
+                            <h3 className="text-xl font-bold mt-4">{blog.title}</h3>
 
-            <p className="text-gray-600 mt-3 text-sm leading-relaxed">
-              {blog.description}
-            </p>
+                            <p className="text-gray-600 mt-3 text-sm leading-relaxed">
+                                {blog.description}
+                            </p>
 
-            <button className="mt-4 px-4 py-1 bg-red-600 text-white text-xs rounded">
-              READ MORE
-            </button>
-          </div>
-        ))}
+                            <button
+                                onClick={() => navigate(`/blog/${blog._id}`)}
+                                className="mt-4 px-4 py-1 bg-red-600 text-white text-xs rounded"
+                            >
+                                READ MORE
+                            </button>
+                        </div>
+                    ))}
 
-      </div>
+                </div>
 
-      {/* Pagination Lines */}
-      <div className="flex justify-center mt-10 gap-2">
-        <span className="w-10 h-[2px] bg-black"></span>
-        <span className="w-10 h-[2px] bg-gray-300"></span>
-        <span className="w-10 h-[2px] bg-gray-300"></span>
-      </div>
+                {/* Pagination Lines */}
+                <div className="flex justify-center mt-10 gap-2">
+                    <span className="w-10 h-[2px] bg-black"></span>
+                    <span className="w-10 h-[2px] bg-gray-300"></span>
+                    <span className="w-10 h-[2px] bg-gray-300"></span>
+                </div>
             </div>
         </>
     );

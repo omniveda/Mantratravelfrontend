@@ -24,6 +24,18 @@ const AdminLayout = () => {
                     >
                         Manage Blogs
                     </Link>
+                    <Link
+                        to="/admin/news"
+                        className="block px-4 py-2 rounded hover:bg-gray-700 transition"
+                    >
+                        Manage News
+                    </Link>
+                    <Link
+                        to="/admin/shop"
+                        className="block px-4 py-2 rounded hover:bg-gray-700 transition"
+                    >
+                        Manage Shop
+                    </Link>
                     {/* Add more links here if needed */}
                 </nav>
                 <div className="p-4 border-t border-gray-700">
