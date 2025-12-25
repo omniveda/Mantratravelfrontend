@@ -192,7 +192,10 @@ export default function Nature() {
                                 {blog.description}
                             </p>
 
-                            <button className="mt-4 px-4 py-1 bg-red-600 text-white text-xs rounded">
+                            <button
+                                onClick={() => navigate(`/blog/${blog._id}`)}
+                                className="mt-4 px-4 py-1 bg-red-600 text-white text-xs rounded"
+                            >
                                 READ MORE
                             </button>
                         </div>
