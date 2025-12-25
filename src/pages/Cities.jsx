@@ -13,7 +13,7 @@ export default function Cities() {
     useEffect(() => {
         const fetchBlogs = async () => {
             try {
-                const res = await axios.get('/api/blogs?tag=cities');
+                const res = await axios.get('https://mantratravelbackend.onrender.com/api/blogs?tag=cities');
                 setBlogs(res.data);
             } catch (err) {
                 console.error("Error fetching nature blogs", err);
@@ -27,7 +27,7 @@ export default function Cities() {
     useEffect(() => {
         const fetchExploreBlogs = async () => {
             try {
-                const res = await axios.get('/api/blogs?tag=explorecities');
+                const res = await axios.get('https://mantratravelbackend.onrender.com/api/blogs?tag=explorecities');
                 setExploreBlog(res.data);
             } catch (err) {
                 console.error("Error fetching nature blogs", err);

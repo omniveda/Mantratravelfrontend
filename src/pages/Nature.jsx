@@ -13,8 +13,13 @@ export default function Nature() {
     useEffect(() => {
         const fetchBlogs = async () => {
             try {
-                const res = await axios.get('/api/blogs?tag=nature');
-                setBlogs(res.data);
+                const res = await axios.get('https://mantratravelbackend.onrender.com/api/blogs?tag=nature');
+                if (Array.isArray(res.data)) {
+                    setBlogs(res.data);
+                } else {
+                    console.error("Nature blogs response is not an array:", res.data);
+                    setBlogs([]);
+                }
             } catch (err) {
                 console.error("Error fetching nature blogs", err);
             } finally {
@@ -28,7 +33,12 @@ export default function Nature() {
         const fetchExploreBlogs = async () => {
             try {
                 const res = await axios.get('/api/blogs?tag=explorenature');
-                setExploreBlog(res.data);
+                if (Array.isArray(res.data)) {
+                    setExploreBlog(res.data);
+                } else {
+                    console.error("Explore nature blogs response is not an array:", res.data);
+                    setExploreBlog([]);
+                }
             } catch (err) {
                 console.error("Error fetching nature blogs", err);
             } finally {
