@@ -27,7 +27,7 @@ export default function Spirituality() {
     useEffect(() => {
         const fetchExploreBlogs = async () => {
             try {
-                const res = await axios.get('/api/blogs?tag=explorespirituality');
+                const res = await axios.get('https://mantratravelbackend.onrender.com/api/blogs?tag=explorespirituality');
                 setExploreBlog(res.data);
             } catch (err) {
                 console.error("Error fetching nature blogs", err);

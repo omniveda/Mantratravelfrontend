@@ -97,8 +97,8 @@ export default function Footer() {
                         </button>
                     </div>
                     <div className=" flex flex-col items-center justify-center text-center">
-                        <img src={logo} alt="" className="w-24 h-24 rounded-full" />
-                        <h2 className="text-4xl  mt-2" style={{ fontFamily: "'Brush Script MT', cursive" }}>The Mantra</h2>
+                        <img src={logo} alt="" className="w-24 h-22 rounded-full" />
+                        <h2 className="text-4xl  mt-2" style={{ fontFamily: "'Brush Script MT', cursive" }}>Voyabyte</h2>
                     </div>
                 </div>
 

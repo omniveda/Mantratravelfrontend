@@ -14,12 +14,31 @@ import india from "../assets/Destinations/India.png";
 import saudiarabia from "../assets/Destinations/saudiarabia.png";
 import indonesia from "../assets/Destinations/indonesia.png";
 import thailand from "../assets/Destinations/Thailand.png";
+import brazil from "../assets/Destinations/brazil.jpg";
+import argentina from "../assets/Destinations/argentina.jpg";
+import chile from "../assets/Destinations/chile.jpg";
+import peru from "../assets/Destinations/peru.jpg";
+import usa from "../assets/Destinations/usa.jpg";
+import canada from "../assets/Destinations/canada.jpg";
+import mexico from "../assets/Destinations/mexico.jpg";
+import morocco from "../assets/Destinations/morocco.jpg";
+import egypt from "../assets/Destinations/egypt.jpg";
+import southAfrica from "../assets/Destinations/southAfrica.jpg";
+import tunisia from "../assets/Destinations/tunisia.jpg";
+
+import france from "../assets/Destinations/france.jpg";
+import spain from "../assets/Destinations/spain.jpg";
+import italy from "../assets/Destinations/italy.jpg";
+import germany from "../assets/Destinations/germany.jpg";
+import uk from "../assets/Destinations/uk.jpg";
+import netherlands from "../assets/Destinations/netherlands.jpg";
 
 export default function WorldCorner() {
     const [selectedCountry, setSelectedCountry] = useState(null);
+    const [activeContinent, setActiveContinent] = useState("Asia");
 
     const continents = [
-        { name: "Asia", img: aisa, active: true },
+        { name: "Asia", img: aisa },
         { name: "America", img: america },
         { name: "South America", img: southAmerica },
         { name: "Africa", img: africa },
@@ -37,6 +56,43 @@ export default function WorldCorner() {
         { name: "indonesia", img: indonesia },
         { name: "thailand", img: thailand },
     ];
+
+    const southAmericaCountries = [
+        { name: "brazil", img: brazil },
+        { name: "argentina", img: argentina },
+        { name: "chile", img: chile },
+        { name: "peru", img: peru },
+    ];
+
+    const americaCountries = [
+        { name: "usa", img: usa },
+        { name: "canada", img: canada },
+        { name: "mexico", img: mexico },
+    ];
+
+    const africaCountries = [
+        { name: "morocco", img: morocco },
+        { name: "egypt", img: egypt },
+        { name: "south africa", img: southAfrica },
+        { name: "tunisia", img: tunisia },
+    ];
+
+    const europeCountries = [
+        { name: "france", img: france },
+        { name: "spain", img: spain },
+        { name: "italy", img: italy },
+        { name: "germany", img: germany },
+        { name: "uk", img: uk },
+        { name: "netherlands", img: netherlands },
+    ];
+
+    const countriesByContinent = {
+        "Asia": asiaCountries,
+        "America": americaCountries,
+        "South America": southAmericaCountries,
+        "Africa": africaCountries,
+        "Europe": europeCountries,
+    };
 
     const handleCountryClick = (countryName) => {
         setSelectedCountry(countryName);
@@ -67,7 +123,8 @@ export default function WorldCorner() {
                 {continents.map((c, i) => (
                     <div
                         key={i}
-                        className={`p-3 rounded-full ${c.active ? "bg-white shadow w-[14%] flex justify-center" : "opacity-60"
+                        onClick={() => setActiveContinent(c.name)}
+                        className={`p-3 rounded-full cursor-pointer transition-all ${activeContinent === c.name ? "bg-white shadow w-[14%] flex justify-center scale-110" : "opacity-60 hover:opacity-100"
                             }`}
                     >
                         <img src={c.img} alt={c.name} className="w-28 h-28" />
@@ -75,14 +132,14 @@ export default function WorldCorner() {
                 ))}
             </div>
 
-            {/* ASIA LABEL */}
-            <h2 className="text-center text-3xl text-sky-400 font-bold mb-12">
-                ASIA
+            {/* CONTINENT LABEL */}
+            <h2 className="text-center text-3xl text-sky-400 font-bold mb-12 uppercase">
+                {activeContinent}
             </h2>
 
             {/* COUNTRY CARDS */}
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-6 mb-16">
-                {asiaCountries.map((country, i) => (
+                {countriesByContinent[activeContinent]?.map((country, i) => (
                     <div
                         key={i}
                         onClick={() => handleCountryClick(country.name)}
@@ -99,10 +156,6 @@ export default function WorldCorner() {
                     </div>
                 ))}
 
-                {/* VIEW MORE */}
-                <div className="flex items-center justify-center border-2 border-dashed rounded-xl text-sm text-gray-500 cursor-pointer">
-                    View More →
-                </div>
             </div>
 
             {/* CONTINENT LISTS */}

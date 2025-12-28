@@ -28,7 +28,7 @@ export default function Blog() {
             setLoading(true);
             try {
                 // Pass tag to backend for server-side filtering if available
-                const endpoint = tag ? `/api/blogs?tag=${encodeURIComponent(tag)}` : "/api/blogs";
+                const endpoint = tag ? `https://mantratravelbackend.onrender.com/api/blogs?tag=${encodeURIComponent(tag)}` : "https://mantratravelbackend.onrender.com/api/blogs";
                 const res = await axios.get(endpoint);
                 setBlogs(res.data);
             } catch (err) {
