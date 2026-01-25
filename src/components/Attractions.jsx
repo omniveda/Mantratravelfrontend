@@ -37,12 +37,13 @@ export default function Attractions() {
           alignItems: "center",
           padding: "8px 0",
         }}
+        className="w-full px-4"
       >
-        <div className="flex gap-2 overflow-hidden">
+        <div className="flex gap-2 overflow-x-auto scrollbar-hide w-full md:justify-center">
           {images.map((img, index) => (
             <div
               key={index}
-              className="w-[90px] md:w-[110px] h-[300px] md:h-[360px] overflow-hidden"
+              className="w-[90px] md:w-[110px] h-[300px] md:h-[360px] overflow-hidden flex-shrink-0"
             >
               <img
                 src={img}

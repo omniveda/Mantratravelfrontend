@@ -1,5 +1,6 @@
 import Footerimg from "../assets/Home_page/Footer.png"
 import logo from "../assets/logo/logo.png"
+import logo_name from "../assets/logo/3.png";
 import { Link } from "react-router-dom";
 import Swal from 'sweetalert2';
 
@@ -97,8 +98,8 @@ export default function Footer() {
                         </button>
                     </div>
                     <div className=" flex flex-col items-center justify-center text-center">
-                        <img src={logo} alt="" className="w-24 h-22 rounded-full" />
-                        <h2 className="text-4xl  mt-2" style={{ fontFamily: "'Brush Script MT', cursive" }}>Voyabyte</h2>
+                        <img src={logo} alt="" className="w-26 h-22 " />
+                        <img src={logo_name} alt="" className="w-26 h-22 " />
                     </div>
                 </div>
 

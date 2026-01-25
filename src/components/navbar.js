@@ -1,4 +1,5 @@
 import logo from "../assets/logo/logo.png";
+import logoName from "../assets/logo/3.png";
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { FaBars, FaTimes } from "react-icons/fa";
@@ -8,17 +9,33 @@ export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <>
-      <nav className="bg-black text-white px-6 py-4 flex justify-between items-center shadow-md sticky top-0 z-[1000] relative">
-        {/* Logo */}
-        <div>
+    <div className="relative">
+      {/* Logo Illustration - Absolutely positioned to span nav bar and green strip */}
+      <div
+        className="absolute left-0 flex flex-col cursor-pointer z-30"
+        onClick={() => navigate("/")}
+        style={{ top: '0px' }}
+      >
+        <img
+          src={logo}
+          alt="Voyabyte logo"
+          className="h-[84px] w-auto object-contain"
+        />
           <img
-            src={logo}
-            alt="logo"
-            onClick={() => navigate("/")}
-            className="h-[45px] w-[50px] rounded-[20px] cursor-pointer"
+            src={logoName}
+            alt="Voyabyte"
+            className="h-[34px] w-auto object-contain"
           />
-        </div>
+       
+      </div>
+      
+      {/* White Strip at Top */}
+      <div className="bg-gray-200 h-5 relative z-10"></div>
+      
+      {/* Main Navigation Bar */}
+      <nav className="bg-black text-white px-6 py-4 flex justify-between items-center shadow-md sticky top-0 z-[20] relative">
+        {/* Spacer to push content away from logo */}
+        <div className="w-[180px]"></div>
 
         {/* Desktop Links */}
         <div className="hidden md:flex gap-8 text-[0.95rem] font-medium">
@@ -85,9 +102,17 @@ export default function Navbar() {
         </div>
       )}
 
-      <div className="bg-[#566d67] text-white p-0 text-center text-xs py-1">
-        Explore tourism and its wonders
+      {/* Dark Green Strip with VOYABYTE Wordmark */}
+      <div className="bg-[#566d67] text-white flex relative">
+        {/* Spacer to align with logo above */}
+        <div className="w-[180px]"></div>
+        {/* VOYABYTE Wordmark positioned below logo (aligned with logo above) */}
+        
+        {/* Centered text on the right side */}
+        <div className="flex-1 text-center text-xs">
+          Explore tourism and its wonders
+        </div>
       </div>
-    </>
+    </div>
   );
 }

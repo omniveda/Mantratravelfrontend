@@ -9,14 +9,6 @@ const slides = [
     img: adventure1,
     text: "Real Aussies, real recommendations. Here are the adventures and awe-inspiring moments you just can’t miss in 2025.",
   },
-//   {
-//     img: "/images/adventure2.jpg",
-//     text: "Discover unforgettable journeys crafted by real travelers across breathtaking destinations.",
-//   },
-//   {
-//     img: "/images/adventure3.jpg",
-//     text: "Adventure awaits where memories are made and stories begin.",
-//   },
 ];
 
 const cards = [
@@ -90,56 +82,55 @@ export default function Adventures() {
             <span
               key={index}
               onClick={() => setCurrent(index)}
-              className={`w-2.5 h-2.5 rounded-full cursor-pointer transition ${
-                current === index
+              className={`w-2.5 h-2.5 rounded-full cursor-pointer transition ${current === index
                   ? "bg-white"
                   : "bg-white/40"
-              }`}
+                }`}
             />
           ))}
         </div>
       </div>
       <div className="relative  mx-auto py-10">
 
-      {/* Slider */}
-      <div className="flex gap-8 overflow-x-auto scrollbar-hide scroll-smooth">
-        {cards.map((card, index) => (
-          <div
-            key={index}
-            className="min-w-[300px] bg-white border rounded-lg overflow-hidden"
-          >
-            {/* Image */}
-            <img
-              src={card.img}
-              alt=""
-              className="w-full h-[220px] object-cover hover:scale-110 transition-all duration-300 cursor-pointer"
-            />
+        {/* Slider */}
+        <div className="flex gap-8 overflow-x-auto scrollbar-hide scroll-smooth">
+          {cards.map((card, index) => (
+            <div
+              key={index}
+              className="min-w-[300px] bg-white border rounded-lg overflow-hidden"
+            >
+              {/* Image */}
+              <img
+                src={card.img}
+                alt=""
+                className="w-full h-[220px] object-cover hover:scale-110 transition-all duration-300 cursor-pointer"
+              />
 
-            {/* Content */}
-            <div className="p-6">
-              <p className="text-lg font-serif leading-relaxed mb-6">
-                Looking for more than just a job? Begin your adventure with us.
-              </p>
+              {/* Content */}
+              <div className="p-6">
+                <p className="text-lg font-serif leading-relaxed mb-6">
+                  Looking for more than just a job? Begin your adventure with us.
+                </p>
 
-              <div className="flex justify-between items-center text-sm text-gray-400 uppercase tracking-wide">
-                <span>{card.tag}</span>
-                <a
-                  href="#"
-                  className="hover:text-black transition"
-                >
-                  visit our website!
-                </a>
+                <div className="flex justify-between items-center text-sm text-gray-400 uppercase tracking-wide">
+                  <span>{card.tag}</span>
+                  <a
+                    href="#"
+                    className="hover:text-black transition"
+                  >
+                    visit our website!
+                  </a>
+                </div>
               </div>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
 
-      {/* Right Arrow */}
-      <button className="absolute right-0 top-1/2 -translate-y-1/2 bg-white shadow-lg p-4 rounded-full">
-        ❯
-      </button>
-    </div>
+        {/* Right Arrow */}
+        <button className="absolute right-0 top-1/2 -translate-y-1/2 bg-white shadow-lg p-4 rounded-full">
+          ❯
+        </button>
+      </div>
     </div>
   );
 }

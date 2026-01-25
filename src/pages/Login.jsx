@@ -6,12 +6,20 @@ const Login = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
+    const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
     const handleLogin = async (e) => {
         e.preventDefault();
+        setError("");
+        setLoading(true);
+
+        console.log("Login attempt started", { email });
+
         try {
-            const res = await axios.post("/api/auth/login", { email, password });
+            const res = await axios.post("http://localhost:4000/api/auth/login", { email, password });
+            console.log("Login successful", res.data);
+
             localStorage.setItem("token", res.data.token);
             localStorage.setItem("user", JSON.stringify(res.data.user));
             if (res.data.user.isAdmin) {
@@ -22,9 +30,12 @@ const Login = () => {
             }
 
         } catch (err) {
+            console.error("Login error:", err);
             setError(
                 err.response?.data?.message || "Login failed. Please check your credentials."
             );
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -56,9 +67,10 @@ const Login = () => {
                     </div>
                     <button
                         type="submit"
-                        className="w-full py-2 font-bold text-white bg-blue-600 rounded hover:bg-blue-700 transition duration-200"
+                        disabled={loading || !email || !password}
+                        className="w-full py-2 font-bold text-white bg-blue-600 rounded hover:bg-blue-700 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                        Login
+                        {loading ? "Logging in..." : "Login"}
                     </button>
                 </form>
             </div>

@@ -10,6 +10,7 @@ const ShopManagement = () => {
         image: null,
     });
     const [loading, setLoading] = useState(false);
+    const [fetching, setFetching] = useState(true);
     const [editId, setEditId] = useState(null);
 
     const token = localStorage.getItem("token");
@@ -19,11 +20,26 @@ const ShopManagement = () => {
     }, []);
 
     const fetchProducts = async () => {
+        setFetching(true);
         try {
-            const response = await axios.get("https://mantratravelbackend.onrender.com/api/products");
-            setProducts(response.data);
+            const response = await axios.get("http://localhost:4000/api/products");
+            // Ensure we always set an array, even if API returns different format
+            const productsData = response.data;
+            if (Array.isArray(productsData)) {
+                setProducts(productsData);
+            } else if (productsData && Array.isArray(productsData.products)) {
+                setProducts(productsData.products);
+            } else if (productsData && Array.isArray(productsData.data)) {
+                setProducts(productsData.data);
+            } else {
+                console.warn("Unexpected API response format:", productsData);
+                setProducts([]);
+            }
         } catch (error) {
             console.error("Error fetching products:", error);
+            setProducts([]); // Set empty array on error to prevent crash
+        } finally {
+            setFetching(false);
         }
     };
 
@@ -50,7 +66,7 @@ const ShopManagement = () => {
 
         try {
             if (editId) {
-                await axios.put(`/api/products/${editId}`, data, {
+                await axios.put(`http://localhost:4000/api/products/${editId}`, data, {
                     headers: {
                         "Content-Type": "multipart/form-data",
                         "x-auth-token": token,
@@ -59,7 +75,7 @@ const ShopManagement = () => {
                 alert("Product updated successfully!");
                 setEditId(null);
             } else {
-                await axios.post("/api/products", data, {
+                await axios.post("http://localhost:4000/api/products", data, {
                     headers: {
                         "Content-Type": "multipart/form-data",
                         "x-auth-token": token,
@@ -80,9 +96,9 @@ const ShopManagement = () => {
     const handleEdit = (product) => {
         setEditId(product._id);
         setFormData({
-            name: product.name,
-            description: product.description,
-            affiliateLink: product.affiliateLink,
+            name: product.name || "",
+            description: product.description || "",
+            affiliateLink: product.affiliateLink || "",
             image: null, // Reset image input as we might not want to change it
         });
         window.scrollTo(0, 0); // Scroll to form
@@ -97,7 +113,7 @@ const ShopManagement = () => {
         if (!window.confirm("Are you sure you want to delete this product?")) return;
 
         try {
-            await axios.delete(`/api/products/${id}`, {
+            await axios.delete(`http://localhost:4000/api/products/${id}`, {
                 headers: { "x-auth-token": token },
             });
             fetchProducts();
@@ -184,50 +200,56 @@ const ShopManagement = () => {
             {/* Product List */}
             <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
                 <h2 className="text-xl font-semibold mb-4 text-gray-700 dark:text-gray-300">Existing Products</h2>
-                <div className="overflow-x-auto">
-                    <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                        <thead className="bg-gray-50 dark:bg-gray-900">
-                            <tr>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Image</th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Link</th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                            {products.map((product) => (
-                                <tr key={product._id}>
-                                    <td className="px-6 py-4 whitespace-nowrap">
-                                        <img src={product.image} alt={product.name} className="h-12 w-12 object-cover rounded" />
-                                    </td>
-                                    <td className="px-6 py-4">
-                                        <div className="text-sm font-medium text-gray-900 dark:text-white">{product.name}</div>
-                                        <div className="text-sm text-gray-500 truncate max-w-xs">{product.description}</div>
-                                    </td>
-                                    <td className="px-6 py-4">
-                                        <a href={product.affiliateLink} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline text-sm">
-                                            View Link
-                                        </a>
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
-                                        <button
-                                            onClick={() => handleEdit(product)}
-                                            className="text-indigo-600 hover:text-indigo-900"
-                                        >
-                                            Edit
-                                        </button>
-                                        <button
-                                            onClick={() => handleDelete(product._id)}
-                                            className="text-red-600 hover:text-red-900"
-                                        >
-                                            Delete
-                                        </button>
-                                    </td>
+                {fetching ? (
+                    <p className="text-gray-500 dark:text-gray-400">Loading products...</p>
+                ) : !Array.isArray(products) || products.length === 0 ? (
+                    <p className="text-gray-500 dark:text-gray-400">No products found. Create your first product!</p>
+                ) : (
+                    <div className="overflow-x-auto">
+                        <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                            <thead className="bg-gray-50 dark:bg-gray-900">
+                                <tr>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Image</th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Link</th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                                 </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
+                            </thead>
+                            <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                                {products.map((product) => (
+                                    <tr key={product._id}>
+                                        <td className="px-6 py-4 whitespace-nowrap">
+                                            <img src={product.image} alt={product.name} className="h-12 w-12 object-cover rounded" />
+                                        </td>
+                                        <td className="px-6 py-4">
+                                            <div className="text-sm font-medium text-gray-900 dark:text-white">{product.name}</div>
+                                            <div className="text-sm text-gray-500 truncate max-w-xs">{product.description}</div>
+                                        </td>
+                                        <td className="px-6 py-4">
+                                            <a href={product.affiliateLink} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline text-sm">
+                                                View Link
+                                            </a>
+                                        </td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
+                                            <button
+                                                onClick={() => handleEdit(product)}
+                                                className="text-indigo-600 hover:text-indigo-900"
+                                            >
+                                                Edit
+                                            </button>
+                                            <button
+                                                onClick={() => handleDelete(product._id)}
+                                                className="text-red-600 hover:text-red-900"
+                                            >
+                                                Delete
+                                            </button>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                )}
             </div>
         </div>
     );

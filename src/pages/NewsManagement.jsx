@@ -4,6 +4,7 @@ import axios from "axios";
 export default function NewsManagement() {
     const [newsList, setNewsList] = useState([]);
     const [loading, setLoading] = useState(false);
+    const [fetching, setFetching] = useState(true);
     const [isEditing, setIsEditing] = useState(false);
     const [currentNewsId, setCurrentNewsId] = useState(null);
 
@@ -14,10 +15,13 @@ export default function NewsManagement() {
         author: "",
         category: "General",
         tags: [],
-        image: null,
+        sections: [{ type: "image", value: null, preview: "" }, { type: "paragraph", value: "" }], // Default layout
+        supporter_opinion: "",
+        opponent_opinion: "",
+        neutral_opinion: "",
     });
 
-    // For handling image preview
+    // For handling image preview (main image if any, but now we use sections)
     const [previewImage, setPreviewImage] = useState(null);
 
     useEffect(() => {
@@ -25,14 +29,27 @@ export default function NewsManagement() {
     }, []);
 
     const fetchNews = async () => {
-        setLoading(true);
+        setFetching(true);
         try {
-            const res = await axios.get("/api/news");
-            setNewsList(res.data);
+            const res = await axios.get("http://localhost:4000/api/news");
+            // Ensure we always set an array, even if API returns different format
+            const newsData = res.data;
+            if (Array.isArray(newsData)) {
+                setNewsList(newsData);
+            } else if (newsData && Array.isArray(newsData.news)) {
+                setNewsList(newsData.news);
+            } else if (newsData && Array.isArray(newsData.data)) {
+                setNewsList(newsData.data);
+            } else {
+                console.warn("Unexpected API response format:", newsData);
+                setNewsList([]);
+            }
         } catch (err) {
-            console.error(err);
+            console.error("Error fetching news:", err);
+            setNewsList([]); // Set empty array on error to prevent crash
             alert("Failed to fetch news");
         } finally {
+            setFetching(false);
             setLoading(false);
         }
     };
@@ -41,14 +58,40 @@ export default function NewsManagement() {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
-    const handleFileChange = (e) => {
-        const file = e.target.files[0];
-        setFormData({ ...formData, image: file });
-        if (file) {
-            setPreviewImage(URL.createObjectURL(file));
+    const addSection = (type) => {
+        let newSection;
+        if (type === "image") {
+            newSection = { type: "image", value: null, preview: "" };
+        } else if (type === "features") {
+            newSection = { type: "features", value: [""] };
         } else {
-            setPreviewImage(null);
+            newSection = { type, value: "" };
         }
+        setFormData({ ...formData, sections: [...formData.sections, newSection] });
+    };
+
+    const removeSection = (index) => {
+        const newSections = [...formData.sections];
+        newSections.splice(index, 1);
+        setFormData({ ...formData, sections: newSections });
+    };
+
+    const handleSectionChange = (index, value) => {
+        const newSections = [...formData.sections];
+        newSections[index].value = value;
+        if (newSections[index].type === "image" && value instanceof File) {
+            newSections[index].preview = URL.createObjectURL(value);
+        }
+        setFormData({ ...formData, sections: newSections });
+    };
+
+    const moveSection = (index, direction) => {
+        if (direction === "up" && index === 0) return;
+        if (direction === "down" && index === formData.sections.length - 1) return;
+        const newSections = [...formData.sections];
+        const newIndex = direction === "up" ? index - 1 : index + 1;
+        [newSections[index], newSections[newIndex]] = [newSections[newIndex], newSections[index]];
+        setFormData({ ...formData, sections: newSections });
     };
 
     const resetForm = () => {
@@ -59,7 +102,10 @@ export default function NewsManagement() {
             author: "",
             category: "General",
             tags: [],
-            image: null
+            sections: [{ type: "subheading", value: "" }, { type: "paragraph", value: "" }],
+            supporter_opinion: "",
+            opponent_opinion: "",
+            neutral_opinion: "",
         });
         setPreviewImage(null);
         setIsEditing(false);
@@ -77,21 +123,29 @@ export default function NewsManagement() {
         data.append("author", formData.author);
         data.append("category", formData.category);
         data.append("tags", JSON.stringify(formData.tags));
+        data.append("supporter_opinion", formData.supporter_opinion);
+        data.append("opponent_opinion", formData.opponent_opinion);
+        data.append("neutral_opinion", formData.neutral_opinion);
 
-        if (formData.image instanceof File) {
-            data.append("image", formData.image);
-        }
+        const contentToSubmit = formData.sections.map((section, index) => {
+            if (section.type === "image" && section.value instanceof File) {
+                data.append(`image_${index}`, section.value);
+                return { type: "image", value: null, isNewFile: true };
+            }
+            return { type: section.type, value: section.value };
+        });
+
+        data.append("content", JSON.stringify(contentToSubmit));
 
         try {
+            const config = {
+                headers: { "Content-Type": "multipart/form-data" },
+            };
             if (isEditing) {
-                await axios.put(`/api/news/${currentNewsId}`, data, {
-                    headers: { "Content-Type": "multipart/form-data" },
-                });
+                await axios.put(`http://localhost:4000/api/news/${currentNewsId}`, data, config);
                 alert("News updated successfully");
             } else {
-                await axios.post("/api/news", data, {
-                    headers: { "Content-Type": "multipart/form-data" },
-                });
+                await axios.post("http://localhost:4000/api/news", data, config);
                 alert("News created successfully");
             }
             fetchNews();
@@ -105,23 +159,38 @@ export default function NewsManagement() {
     };
 
     const handleEdit = (news) => {
+        let sections = [];
+        if (news.content && news.content.length > 0) {
+            sections = news.content.map(c => ({
+                type: c.type,
+                value: c.value,
+                preview: c.type === 'image' ? c.value : ''
+            }));
+        } else {
+            // Fallback
+            if (news.image) sections.push({ type: "image", value: news.image, preview: news.image });
+            if (news.description) sections.push({ type: "paragraph", value: news.description });
+        }
+
+        if (sections.length === 0) {
+            sections.push({ type: "subheading", value: "" });
+            sections.push({ type: "paragraph", value: "" });
+        }
+
         setIsEditing(true);
         setCurrentNewsId(news._id);
         setFormData({
-            heading: news.heading,
+            heading: news.heading || "",
             subHeading: news.subHeading || "",
-            description: news.description,
-            author: news.author,
+            description: news.description || "",
+            author: news.author || "",
             category: news.category || "General",
-            tags: news.tags || [],
-            image: news.image // keep existing url string or overwrite if new file
+            tags: Array.isArray(news.tags) ? news.tags : [],
+            sections: sections,
+            supporter_opinion: news.supporter_opinion || "",
+            opponent_opinion: news.opponent_opinion || "",
+            neutral_opinion: news.neutral_opinion || "",
         });
-        // If image is a string (url), show it in preview
-        if (typeof news.image === 'string') {
-            setPreviewImage(news.image);
-        } else {
-            setPreviewImage(null);
-        }
         // Scroll to top
         window.scrollTo(0, 0);
     };
@@ -130,7 +199,7 @@ export default function NewsManagement() {
         if (!window.confirm("Are you sure you want to delete this news?")) return;
         setLoading(true);
         try {
-            await axios.delete(`/api/news/${id}`);
+            await axios.delete(`http://localhost:4000/api/news/${id}`);
             alert("News deleted");
             fetchNews();
         } catch (err) {
@@ -204,16 +273,147 @@ export default function NewsManagement() {
                         </div>
                     </div>
 
-                    {/* Description */}
-                    <div>
+                    {/* Dynamic Sections */}
+                    <div className="space-y-4">
+                        <label className="block font-medium dark:text-gray-300">News Content Sections</label>
+                        {formData.sections.map((section, index) => (
+                            <div key={index} className="p-4 border rounded relative bg-gray-50 dark:bg-gray-700 dark:border-gray-600">
+                                <div className="absolute top-2 right-2 flex gap-2">
+                                    <button type="button" onClick={() => moveSection(index, "up")} className="p-1 hover:text-blue-500" title="Move Up">↑</button>
+                                    <button type="button" onClick={() => moveSection(index, "down")} className="p-1 hover:text-blue-500" title="Move Down">↓</button>
+                                    <button type="button" onClick={() => removeSection(index)} className="p-1 text-red-500 hover:text-red-700" title="Remove">×</button>
+                                </div>
+
+                                {section.type === "paragraph" ? (
+                                    <div>
+                                        <span className="text-xs font-bold uppercase text-gray-500 mb-2 block">Paragraph</span>
+                                        <textarea
+                                            value={section.value}
+                                            onChange={(e) => handleSectionChange(index, e.target.value)}
+                                            rows="4"
+                                            className="w-full px-4 py-2 border rounded dark:bg-gray-800 dark:border-gray-600 dark:text-white"
+                                            required
+                                        />
+                                    </div>
+                                ) : section.type === "subheading" ? (
+                                    <div>
+                                        <span className="text-xs font-bold uppercase text-gray-500 mb-2 block">Subheading</span>
+                                        <input
+                                            type="text"
+                                            value={section.value}
+                                            onChange={(e) => handleSectionChange(index, e.target.value)}
+                                            className="w-full px-4 py-2 border rounded font-bold text-lg dark:bg-gray-800 dark:border-gray-600 dark:text-white"
+                                            required
+                                        />
+                                    </div>
+                                ) : section.type === "quote" ? (
+                                    <div>
+                                        <span className="text-xs font-bold uppercase text-gray-500 mb-2 block">Quote</span>
+                                        <textarea
+                                            value={section.value}
+                                            onChange={(e) => handleSectionChange(index, e.target.value)}
+                                            rows="2"
+                                            className="w-full px-4 py-2 border rounded italic bg-blue-50 dark:bg-gray-900 dark:border-gray-600 dark:text-white"
+                                            required
+                                        />
+                                    </div>
+                                ) : (
+                                    <div>
+                                        <span className="text-xs font-bold uppercase text-gray-500 mb-2 block">Image</span>
+                                        <input
+                                            type="file"
+                                            accept="image/*"
+                                            onChange={(e) => handleSectionChange(index, e.target.files[0])}
+                                            className="w-full mb-2"
+                                        />
+                                        {section.preview && (
+                                            <img src={section.preview} alt="Preview" className="h-32 w-auto object-cover rounded" />
+                                        )}
+                                    </div>
+                                )}
+                            </div>
+                        ))}
+                        <div className="flex flex-wrap gap-2">
+                            <button
+                                type="button"
+                                onClick={() => addSection("subheading")}
+                                className="px-3 py-1 text-sm border border-purple-600 text-purple-600 rounded hover:bg-purple-50"
+                            >
+                                + Subheading
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => addSection("paragraph")}
+                                className="px-3 py-1 text-sm border border-blue-600 text-blue-600 rounded hover:bg-blue-50"
+                            >
+                                + Paragraph
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => addSection("image")}
+                                className="px-3 py-1 text-sm border border-green-600 text-green-600 rounded hover:bg-green-50"
+                            >
+                                + Image
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => addSection("quote")}
+                                className="px-3 py-1 text-sm border border-yellow-600 text-yellow-600 rounded hover:bg-yellow-50"
+                            >
+                                + Quote
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* Opinion Sections */}
+                    <div className="space-y-4 pt-4 border-t dark:border-gray-700">
+                        <h3 className="text-lg font-bold dark:text-gray-200">Opinions</h3>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div>
+                                <label className="block text-sm font-medium mb-1 text-green-600 underline">Supporter Opinion</label>
+                                <textarea
+                                    name="supporter_opinion"
+                                    value={formData.supporter_opinion}
+                                    onChange={handleChange}
+                                    rows="3"
+                                    className="w-full border rounded px-3 py-2 dark:bg-gray-700 dark:border-gray-600"
+                                    placeholder="Enter supporter opinion..."
+                                ></textarea>
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium mb-1 text-red-600 underline">Opponent Opinion</label>
+                                <textarea
+                                    name="opponent_opinion"
+                                    value={formData.opponent_opinion}
+                                    onChange={handleChange}
+                                    rows="3"
+                                    className="w-full border rounded px-3 py-2 dark:bg-gray-700 dark:border-gray-600"
+                                    placeholder="Enter opponent opinion..."
+                                ></textarea>
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium mb-1 text-orange-600 underline">Neutral Opinion</label>
+                                <textarea
+                                    name="neutral_opinion"
+                                    value={formData.neutral_opinion}
+                                    onChange={handleChange}
+                                    rows="3"
+                                    className="w-full border rounded px-3 py-2 dark:bg-gray-700 dark:border-gray-600"
+                                    placeholder="Enter neutral opinion..."
+                                ></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Description - Still keeping as hidden or secondary if needed, but primary content is now sections */}
+                    <div className="hidden">
                         <label className="block text-sm font-medium mb-1">Description / Content</label>
                         <textarea
                             name="description"
                             value={formData.description}
                             onChange={handleChange}
-                            rows="5"
+                            rows="1"
                             className="w-full border rounded px-3 py-2 dark:bg-gray-700 dark:border-gray-600"
-                            required
                         ></textarea>
                     </div>
 
@@ -266,21 +466,7 @@ export default function NewsManagement() {
                         </div>
                     </div>
 
-                    {/* Image Upload */}
-                    <div>
-                        <label className="block text-sm font-medium mb-1">Image</label>
-                        <input
-                            type="file"
-                            onChange={handleFileChange}
-                            accept="image/*"
-                            className="w-full border rounded px-3 py-2 dark:bg-gray-700 dark:border-gray-600"
-                        />
-                        {previewImage && (
-                            <div className="mt-2 w-40 h-24 border rounded overflow-hidden">
-                                <img src={previewImage} alt="Preview" className="w-full h-full object-cover" />
-                            </div>
-                        )}
-                    </div>
+
 
                     {/* Action Buttons */}
                     <div className="flex gap-4">
@@ -307,7 +493,9 @@ export default function NewsManagement() {
             {/* List */}
             <div className="bg-white dark:bg-gray-800 p-6 rounded shadow">
                 <h2 className="text-xl font-semibold mb-4">All News</h2>
-                {newsList.length === 0 ? (
+                {fetching ? (
+                    <p className="text-gray-500">Loading news...</p>
+                ) : !Array.isArray(newsList) || newsList.length === 0 ? (
                     <p className="text-gray-500">No news found.</p>
                 ) : (
                     <div className="overflow-x-auto">

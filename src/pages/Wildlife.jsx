@@ -13,7 +13,7 @@ export default function Wildlife() {
     useEffect(() => {
         const fetchBlogs = async () => {
             try {
-                const res = await axios.get('https://mantratravelbackend.onrender.com/api/blogs?tag=wildlife');
+                const res = await axios.get('http://localhost:4000/api/blogs?tag=wildlife');
                 setBlogs(res.data);
             } catch (err) {
                 console.error("Error fetching nature blogs", err);
@@ -27,7 +27,7 @@ export default function Wildlife() {
     useEffect(() => {
         const fetchExploreBlogs = async () => {
             try {
-                const res = await axios.get('https://mantratravelbackend.onrender.com/api/blogs?tag=explorewildlife');
+                const res = await axios.get('http://localhost:4000/api/blogs?tag=explorewildlife');
                 setExploreBlog(res.data);
             } catch (err) {
                 console.error("Error fetching nature blogs", err);
@@ -40,38 +40,16 @@ export default function Wildlife() {
 
     return (
         <>
-            <div style={{ display: 'flex', flexDirection: 'column', height: '680px' }}>
-                <div style={{
-                    flex: 1,
-                    backgroundImage: `url(${wildlife_hero})`,
-                    backgroundSize: 'cover',
-                    backgroundPosition: 'center',
-                    position: 'relative'
-                }}>
-                    <div style={{
-                        position: 'absolute',
-                        top: '3%',
-                        left: '0',
-                        width: '100%',
-                        display: 'flex',
-                        justifyContent: 'space-around',
-                        alignItems: 'center',
-                        background: 'rgba(0,0,0,0.5)',
-                        padding: '10px 0',
-                        borderRadius: '5px'
-                    }}>
+            <div className="flex flex-col h-[50vh] md:h-[680px]">
+                <div
+                    className="flex-1 bg-cover bg-center relative"
+                    style={{ backgroundImage: `url(${wildlife_hero})` }}
+                >
+                    <div className="absolute top-[3%] left-0 w-full flex flex-wrap justify-center md:justify-around items-center bg-black/50 py-2 md:py-[10px] rounded-md gap-2 md:gap-0 px-2">
                         {['nature', 'wildlife', 'adventures', 'heritage', 'spirituality', 'cities', 'culture'].map((item, idx) => (
                             <button
                                 key={idx}
-                                style={{
-                                    background: 'none',
-                                    border: 'none',
-                                    color: '#fff',
-                                    fontSize: '1rem',
-                                    cursor: 'pointer',
-                                    padding: '5px 10px'
-                                }}
-                                className='hover:scale-105 transition-all duration-300'
+                                className='text-white text-xs md:text-base cursor-pointer px-2 md:px-[10px] py-[5px] hover:scale-105 transition-all duration-300 bg-transparent border-none'
                                 onClick={() => {
                                     navigate(`/${item}`)
                                 }}
@@ -81,13 +59,7 @@ export default function Wildlife() {
                         ))}
                     </div>
                     <p
-                        style={{
-                            position: 'absolute',
-                            bottom: '3%',
-                            left: '50%',
-                            transform: 'translateX(-50%)',
-                        }}
-                        className="nature-text"
+                        className="nature-text absolute bottom-[10%] md:bottom-[3%] left-1/2 -translate-x-1/2 text-white font-bold text-4xl md:text-[6rem]"
                     >
                         WILDLIFE
                     </p>
@@ -96,10 +68,10 @@ export default function Wildlife() {
             </div>
 
             {/* Blog Grid Section */}
-            <div className="bg-[#0f172a] py-16 px-8 min-h-screen">
-                <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12">
+            <div className="bg-[#0f172a] py-8 md:py-16 px-4 md:px-8 min-h-screen">
+                <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12">
                     {loading ? (
-                        <p className="text-white text-center col-span-2">Loading blogs...</p>
+                        <p className="text-white text-center col-span-1 md:col-span-2">Loading blogs...</p>
                     ) : blogs.length > 0 ? (
                         blogs.map((blog) => (
                             <div key={blog._id} className="text-white">
@@ -108,30 +80,30 @@ export default function Wildlife() {
                                     <img
                                         src={blog.image || 'https://via.placeholder.com/600x400'}
                                         alt={blog.heading}
-                                        className="w-full h-[350px] object-cover transition-transform duration-500 group-hover:scale-105"
+                                        className="w-full h-[250px] md:h-[350px] object-cover transition-transform duration-500 group-hover:scale-105"
                                     />
                                     {/* Icons Overlay */}
                                     <div className="absolute bottom-4 left-4 flex gap-3">
-                                        <div className="bg-white/20 backdrop-blur-sm p-3 rounded-full hover:bg-white/40 cursor-pointer transition">
-                                            <FaHeart className="w-5 h-5" />
+                                        <div className="bg-white/20 backdrop-blur-sm p-2 md:p-3 rounded-full hover:bg-white/40 cursor-pointer transition">
+                                            <FaHeart className="w-4 h-4 md:w-5 md:h-5" />
                                         </div>
-                                        <div className="bg-white/20 backdrop-blur-sm p-3 rounded-full hover:bg-white/40 cursor-pointer transition">
-                                            <FaBookmark className="w-5 h-5" />
+                                        <div className="bg-white/20 backdrop-blur-sm p-2 md:p-3 rounded-full hover:bg-white/40 cursor-pointer transition">
+                                            <FaBookmark className="w-4 h-4 md:w-5 md:h-5" />
                                         </div>
-                                        <div className="bg-white/20 backdrop-blur-sm p-3 rounded-full hover:bg-white/40 cursor-pointer transition">
-                                            <FaComment className="w-5 h-5" />
+                                        <div className="bg-white/20 backdrop-blur-sm p-2 md:p-3 rounded-full hover:bg-white/40 cursor-pointer transition">
+                                            <FaComment className="w-4 h-4 md:w-5 md:h-5" />
                                         </div>
                                     </div>
                                 </div>
 
                                 {/* Content */}
-                                <h3 className="text-2xl font-bold mb-2 leading-tight">
+                                <h3 className="text-xl md:text-2xl font-bold mb-2 leading-tight">
                                     {blog.heading}
                                 </h3>
-                                <p className="text-gray-400 text-sm font-bold tracking-widest uppercase mb-4">
+                                <p className="text-gray-400 text-xs md:text-sm font-bold tracking-widest uppercase mb-4">
                                     NATURE REVIEW
                                 </p>
-                                <p className="text-gray-300 text-lg leading-relaxed mb-6 line-clamp-3">
+                                <p className="text-gray-300 text-base md:text-lg leading-relaxed mb-6 line-clamp-3">
                                     {blog.description}
                                 </p>
                                 <button
@@ -144,27 +116,27 @@ export default function Wildlife() {
                             </div>
                         ))
                     ) : (
-                        <p className="text-gray-400 text-center col-span-2">No nature blogs found.</p>
+                        <p className="text-gray-400 text-center col-span-1 md:col-span-2">No nature blogs found.</p>
                     )}
                 </div>
             </div>
 
-            <div className='bg-white py-16 px-6 relative'>
-                <h2 className="text-center text-4xl font-bold tracking-widest mb-12">
+            <div className='bg-white py-8 md:py-16 px-4 md:px-6 relative'>
+                <h2 className="text-center text-2xl md:text-4xl font-bold tracking-widest mb-8 md:mb-12">
                     RELATED BLOGS
                 </h2>
 
-                {/* Arrows */}
-                <button className="absolute left-6 top-1/2 -translate-y-1/2 w-10 h-10 bg-white shadow rounded-full flex items-center justify-center">
+                {/* Arrows (Hidden on mobile) */}
+                <button className="hidden md:flex absolute left-6 top-1/2 -translate-y-1/2 w-10 h-10 bg-white shadow rounded-full items-center justify-center hover:bg-gray-50 transition">
                     ←
                 </button>
 
-                <button className="absolute right-6 top-1/2 -translate-y-1/2 w-10 h-10 bg-white shadow rounded-full flex items-center justify-center">
+                <button className="hidden md:flex absolute right-6 top-1/2 -translate-y-1/2 w-10 h-10 bg-white shadow rounded-full items-center justify-center hover:bg-gray-50 transition">
                     →
                 </button>
 
                 {/* Blog Cards */}
-                <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-10">
+                <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-10">
 
                     {exploreBlog.map((blog) => (
                         <div key={blog.id} className="relative">
@@ -173,12 +145,12 @@ export default function Wildlife() {
                             <img
                                 src={blog.image}
                                 alt={blog.title}
-                                className="w-full h-[350px] object-cover"
+                                className="w-full h-[250px] md:h-[350px] object-cover rounded-md md:rounded-none"
                             />
 
                             {/* Overlay (only if exists) */}
                             {blog.overlayText && (
-                                <div className="absolute inset-0 bg-black/40 flex items-center p-6">
+                                <div className="absolute inset-0 bg-black/40 flex items-center p-6 rounded-md md:rounded-none">
                                     <h3 className="text-white text-xl font-bold leading-snug">
                                         {blog.overlayText}
                                     </h3>
@@ -186,15 +158,15 @@ export default function Wildlife() {
                             )}
 
                             {/* Content */}
-                            <h3 className="text-xl font-bold mt-4">{blog.title}</h3>
+                            <h3 className="text-lg md:text-xl font-bold mt-4">{blog.title}</h3>
 
-                            <p className="text-gray-600 mt-3 text-sm leading-relaxed">
+                            <p className="text-gray-600 mt-2 md:mt-3 text-sm leading-relaxed">
                                 {blog.description}
                             </p>
 
                             <button
                                 onClick={() => navigate(`/blog/${blog._id}`)}
-                                className="mt-4 px-4 py-1 bg-red-600 text-white text-xs rounded"
+                                className="mt-4 px-4 py-1 bg-red-600 text-white text-xs rounded hover:bg-red-700 transition"
                             >
                                 READ MORE
                             </button>

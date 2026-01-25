@@ -8,34 +8,115 @@ const BlogManagement = () => {
     const [currentBlogId, setCurrentBlogId] = useState(null);
     const [formData, setFormData] = useState({
         heading: "",
-        description: "",
         author: "",
         tags: [],
-        image: null,
+        country: "General",
+        category: "Blog",
+        section: "General",
+        externalLink: "",
+        sections: [{ type: "image", value: null, preview: "" }, { type: "paragraph", value: "" }], // Default layout
     });
     const [showForm, setShowForm] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [fetching, setFetching] = useState(true);
+    const [filterCategory, setFilterCategory] = useState("");
+    const [filterCountry, setFilterCountry] = useState("");
+    const [filterSection, setFilterSection] = useState("");
 
     // Fetch blogs
     const fetchBlogs = async () => {
+        setFetching(true);
         try {
-            const res = await axios.get("/api/blogs");
-            setBlogs(res.data);
+            let url = "http://localhost:4000/api/blogs";
+            const params = new URLSearchParams();
+            if (filterCategory) params.append("category", filterCategory);
+            if (filterCountry) params.append("country", filterCountry);
+            if (filterSection) params.append("section", filterSection);
+
+            if (params.toString()) {
+                url += `?${params.toString()}`;
+            }
+
+            const res = await axios.get(url);
+            const blogsData = res.data;
+            if (Array.isArray(blogsData)) {
+                setBlogs(blogsData);
+            } else if (blogsData && Array.isArray(blogsData.blogs)) {
+                setBlogs(blogsData.blogs);
+            } else if (blogsData && Array.isArray(blogsData.data)) {
+                setBlogs(blogsData.data);
+            } else {
+                console.warn("Unexpected API response format:", blogsData);
+                setBlogs([]);
+            }
         } catch (err) {
             console.error("Error fetching blogs", err);
+            setBlogs([]);
+        } finally {
+            setFetching(false);
         }
     };
 
     useEffect(() => {
         fetchBlogs();
-    }, []);
+    }, [filterCategory, filterCountry, filterSection]);
 
     const handleChange = (e) => {
-        if (e.target.name === "image") {
-            setFormData({ ...formData, image: e.target.files[0] });
+        setFormData({ ...formData, [e.target.name]: e.target.value });
+    };
+
+    const addSection = (type) => {
+        let newSection;
+        if (type === "image") {
+            newSection = { type: "image", value: null, preview: "" };
+        } else if (type === "features") {
+            newSection = { type: "features", value: [""] };
         } else {
-            setFormData({ ...formData, [e.target.name]: e.target.value });
+            newSection = { type, value: "" };
         }
+        setFormData({ ...formData, sections: [...formData.sections, newSection] });
+    };
+
+    const removeSection = (index) => {
+        const newSections = [...formData.sections];
+        newSections.splice(index, 1);
+        setFormData({ ...formData, sections: newSections });
+    };
+
+    const handleSectionChange = (index, value) => {
+        const newSections = [...formData.sections];
+        newSections[index].value = value;
+        if (newSections[index].type === "image" && value instanceof File) {
+            newSections[index].preview = URL.createObjectURL(value);
+        }
+        setFormData({ ...formData, sections: newSections });
+    };
+
+    const handleFeatureListChange = (sIdx, fIdx, val) => {
+        const newSections = [...formData.sections];
+        newSections[sIdx].value[fIdx] = val;
+        setFormData({ ...formData, sections: newSections });
+    };
+
+    const addFeatureItem = (sIdx) => {
+        const newSections = [...formData.sections];
+        newSections[sIdx].value.push("");
+        setFormData({ ...formData, sections: newSections });
+    };
+
+    const removeFeatureItem = (sIdx, fIdx) => {
+        const newSections = [...formData.sections];
+        newSections[sIdx].value.splice(fIdx, 1);
+        setFormData({ ...formData, sections: newSections });
+    };
+
+    const moveSection = (index, direction) => {
+        if (direction === "up" && index === 0) return;
+        if (direction === "down" && index === formData.sections.length - 1) return;
+        const newSections = [...formData.sections];
+        const newIndex = direction === "up" ? index - 1 : index + 1;
+        [newSections[index], newSections[newIndex]] = [newSections[newIndex], newSections[index]];
+        setFormData({ ...formData, sections: newSections });
     };
 
     const handleSubmit = async (e) => {
@@ -43,12 +124,22 @@ const BlogManagement = () => {
         setLoading(true);
         const data = new FormData();
         data.append("heading", formData.heading);
-        data.append("description", formData.description);
         data.append("author", formData.author);
         data.append("tags", JSON.stringify(formData.tags));
-        if (formData.image) {
-            data.append("image", formData.image);
-        }
+        data.append("country", formData.country);
+        data.append("category", formData.category);
+        data.append("section", formData.section);
+        data.append("externalLink", formData.externalLink);
+
+        const contentToSubmit = formData.sections.map((section, index) => {
+            if (section.type === "image" && section.value instanceof File) {
+                data.append(`image_${index}`, section.value);
+                return { type: "image", value: null, isNewFile: true };
+            }
+            return { type: section.type, value: section.value };
+        });
+
+        data.append("content", JSON.stringify(contentToSubmit));
 
         try {
             const token = localStorage.getItem("token");
@@ -60,9 +151,9 @@ const BlogManagement = () => {
             };
 
             if (isEditing) {
-                await axios.put(`/api/blogs/${currentBlogId}`, data, config);
+                await axios.put(`http://localhost:4000/api/blogs/${currentBlogId}`, data, config);
             } else {
-                await axios.post("/api/blogs", data, config);
+                await axios.post("http://localhost:4000/api/blogs", data, config);
             }
 
             resetForm();
@@ -80,7 +171,7 @@ const BlogManagement = () => {
         if (!window.confirm("Are you sure?")) return;
         try {
             const token = localStorage.getItem("token");
-            await axios.delete(`/api/blogs/${id}`, {
+            await axios.delete(`http://localhost:4000/api/blogs/${id}`, {
                 headers: { "x-auth-token": token },
             });
             fetchBlogs();
@@ -91,12 +182,42 @@ const BlogManagement = () => {
     };
 
     const handleEdit = (blog) => {
+        let sections = [];
+        if (blog.content && blog.content.length > 0) {
+            sections = blog.content.map(c => ({
+                type: c.type,
+                value: c.value,
+                preview: c.type === 'image' ? c.value : ''
+            }));
+        } else {
+            // Fallback for previous multi-layout version
+            const paragraphs = Array.isArray(blog.paragraphs) ? blog.paragraphs : [blog.description];
+            const images = Array.isArray(blog.images) ? blog.images : [blog.image];
+            const maxLen = Math.max(paragraphs.length, images.length);
+            for (let i = 0; i < maxLen; i++) {
+                if (i < images.length && images[i]) {
+                    sections.push({ type: "image", value: images[i], preview: images[i] });
+                }
+                if (i < paragraphs.length && paragraphs[i]) {
+                    sections.push({ type: "paragraph", value: paragraphs[i] });
+                }
+            }
+        }
+
+        if (sections.length === 0) {
+            sections.push({ type: "subheading", value: "" });
+            sections.push({ type: "paragraph", value: "" });
+        }
+
         setFormData({
-            heading: blog.heading,
-            description: blog.description,
-            author: blog.author,
-            tags: blog.tags,
-            image: null, // Reset image input on edit start
+            heading: blog.heading || "",
+            author: blog.author || "",
+            tags: Array.isArray(blog.tags) ? blog.tags : [],
+            country: blog.country || "General",
+            category: blog.category || "Blog",
+            section: blog.section || "General",
+            externalLink: blog.externalLink || "",
+            sections: sections,
         });
         setCurrentBlogId(blog._id);
         setIsEditing(true);
@@ -106,10 +227,13 @@ const BlogManagement = () => {
     const resetForm = () => {
         setFormData({
             heading: "",
-            description: "",
             author: "",
             tags: [],
-            image: null,
+            country: "General",
+            category: "Blog",
+            section: "General",
+            externalLink: "",
+            sections: [{ type: "subheading", value: "" }, { type: "paragraph", value: "" }],
         });
         setIsEditing(false);
         setCurrentBlogId(null);
@@ -134,24 +258,87 @@ const BlogManagement = () => {
                         {isEditing ? "Edit Blog" : "Create New Blog"}
                     </h2>
                     <form onSubmit={handleSubmit} className="space-y-4">
-                        <div>
-                            <label className="block mb-1 font-medium dark:text-gray-300">Heading</label>
-                            <input
-                                name="heading"
-                                value={formData.heading}
-                                onChange={handleChange}
-                                className="w-full px-4 py-2 border rounded dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                                required
-                            />
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label className="block mb-1 font-medium dark:text-gray-300">Heading</label>
+                                <input
+                                    name="heading"
+                                    value={formData.heading}
+                                    onChange={handleChange}
+                                    className="w-full px-4 py-2 border rounded dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                                    required
+                                />
+                            </div>
+                            <div>
+                                <label className="block mb-1 font-medium dark:text-gray-300">Author</label>
+                                <input
+                                    name="author"
+                                    value={formData.author}
+                                    onChange={handleChange}
+                                    className="w-full px-4 py-2 border rounded dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                                    required
+                                />
+                            </div>
                         </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div>
+                                <label className="block mb-1 font-medium dark:text-gray-300">Category</label>
+                                <select
+                                    name="category"
+                                    value={formData.category}
+                                    onChange={handleChange}
+                                    className="w-full px-4 py-2 border rounded dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                                >
+                                    <option value="Blog">General Blog</option>
+                                    <option value="Destination">Destination Content</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label className="block mb-1 font-medium dark:text-gray-300">Country</label>
+                                <select
+                                    name="country"
+                                    value={formData.country}
+                                    onChange={handleChange}
+                                    className="w-full px-4 py-2 border rounded dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                                >
+                                    <option value="General">General/Global</option>
+                                    <option value="India">India</option>
+                                    <option value="USA">USA</option>
+                                    <option value="UK">UK</option>
+                                    <option value="France">France</option>
+                                    <option value="Switzerland">Switzerland</option>
+                                    <option value="Australia">Australia</option>
+                                    <option value="Bali">Bali</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label className="block mb-1 font-medium dark:text-gray-300">Section</label>
+                                <select
+                                    name="section"
+                                    value={formData.section}
+                                    onChange={handleChange}
+                                    className="w-full px-4 py-2 border rounded dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                                >
+                                    <option value="General">General Blog Section</option>
+                                    <option value="Explorer">Explorer (Grid)</option>
+                                    <option value="States">States/Regions</option>
+                                    <option value="Hero">Hero/Promotional</option>
+                                    <option value="Instagram">Instagram Feed</option>
+                                    <option value="Testimonials">Testimonials</option>
+                                    <option value="DestinationPicks">Destination Picks</option>
+                                </select>
+                            </div>
+                        </div>
+
                         <div>
-                            <label className="block mb-1 font-medium dark:text-gray-300">Author</label>
+                            <label className="block mb-1 font-medium dark:text-gray-300">External Link (Instagram/CTA)</label>
                             <input
-                                name="author"
-                                value={formData.author}
+                                name="externalLink"
+                                value={formData.externalLink}
                                 onChange={handleChange}
+                                placeholder="https://instagram.com/..."
                                 className="w-full px-4 py-2 border rounded dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                                required
                             />
                         </div>
                         <div>
@@ -290,31 +477,137 @@ const BlogManagement = () => {
                             </div>
                         </div>
 
-                        <div>
-                            <label className="block mb-1 font-medium dark:text-gray-300">Description</label>
-                            <textarea
-                                name="description"
-                                value={formData.description}
-                                onChange={handleChange}
-                                rows="5"
-                                className="w-full px-4 py-2 border rounded dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                                required
-                            />
+                        <div className="space-y-4">
+                            <label className="block font-medium dark:text-gray-300">Blog Content Sections</label>
+                            {formData.sections.map((section, index) => (
+                                <div key={index} className="p-4 border rounded relative bg-gray-50 dark:bg-gray-700 dark:border-gray-600">
+                                    <div className="absolute top-2 right-2 flex gap-2">
+                                        <button type="button" onClick={() => moveSection(index, "up")} className="p-1 hover:text-blue-500" title="Move Up">↑</button>
+                                        <button type="button" onClick={() => moveSection(index, "down")} className="p-1 hover:text-blue-500" title="Move Down">↓</button>
+                                        <button type="button" onClick={() => removeSection(index)} className="p-1 text-red-500 hover:text-red-700" title="Remove">×</button>
+                                    </div>
+
+                                    {section.type === "paragraph" ? (
+                                        <div>
+                                            <span className="text-xs font-bold uppercase text-gray-500 mb-2 block">Paragraph</span>
+                                            <textarea
+                                                value={section.value}
+                                                onChange={(e) => handleSectionChange(index, e.target.value)}
+                                                rows="4"
+                                                className="w-full px-4 py-2 border rounded dark:bg-gray-800 dark:border-gray-600 dark:text-white"
+                                                required
+                                            />
+                                        </div>
+                                    ) : section.type === "subheading" ? (
+                                        <div>
+                                            <span className="text-xs font-bold uppercase text-gray-500 mb-2 block">Subheading</span>
+                                            <input
+                                                type="text"
+                                                value={section.value}
+                                                onChange={(e) => handleSectionChange(index, e.target.value)}
+                                                className="w-full px-4 py-2 border rounded font-bold text-lg dark:bg-gray-800 dark:border-gray-600 dark:text-white"
+                                                required
+                                            />
+                                        </div>
+                                    ) : section.type === "quote" ? (
+                                        <div>
+                                            <span className="text-xs font-bold uppercase text-gray-500 mb-2 block">Quote</span>
+                                            <textarea
+                                                value={section.value}
+                                                onChange={(e) => handleSectionChange(index, e.target.value)}
+                                                rows="2"
+                                                className="w-full px-4 py-2 border rounded italic bg-blue-50 dark:bg-gray-900 dark:border-gray-600 dark:text-white"
+                                                required
+                                            />
+                                        </div>
+                                    ) : section.type === "features" ? (
+                                        <div>
+                                            <span className="text-xs font-bold uppercase text-gray-500 mb-2 block">Features List</span>
+                                            <div className="space-y-2">
+                                                {Array.isArray(section.value) && section.value.map((feature, fIdx) => (
+                                                    <div key={fIdx} className="flex gap-2">
+                                                        <input
+                                                            type="text"
+                                                            value={feature}
+                                                            onChange={(e) => handleFeatureListChange(index, fIdx, e.target.value)}
+                                                            className="flex-1 px-4 py-2 border rounded dark:bg-gray-800 dark:border-gray-600 dark:text-white"
+                                                            placeholder="Enter feature..."
+                                                            required
+                                                        />
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => removeFeatureItem(index, fIdx)}
+                                                            className="px-2 text-red-500 font-bold"
+                                                        >
+                                                            -
+                                                        </button>
+                                                    </div>
+                                                ))}
+                                                <button
+                                                    type="button"
+                                                    onClick={() => addFeatureItem(index)}
+                                                    className="text-sm text-blue-600 font-semibold hover:underline"
+                                                >
+                                                    + Add Item
+                                                </button>
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        <div>
+                                            <span className="text-xs font-bold uppercase text-gray-500 mb-2 block">Image</span>
+                                            <input
+                                                type="file"
+                                                accept="image/*"
+                                                onChange={(e) => handleSectionChange(index, e.target.files[0])}
+                                                className="w-full mb-2"
+                                            />
+                                            {section.preview && (
+                                                <img src={section.preview} alt="Preview" className="h-32 w-auto object-cover rounded" />
+                                            )}
+                                        </div>
+                                    )}
+                                </div>
+                            ))}
+                            <div className="flex flex-wrap gap-2">
+                                <button
+                                    type="button"
+                                    onClick={() => addSection("subheading")}
+                                    className="px-3 py-1 text-sm border border-purple-600 text-purple-600 rounded hover:bg-purple-50"
+                                >
+                                    + Subheading
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => addSection("paragraph")}
+                                    className="px-3 py-1 text-sm border border-blue-600 text-blue-600 rounded hover:bg-blue-50"
+                                >
+                                    + Paragraph
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => addSection("image")}
+                                    className="px-3 py-1 text-sm border border-green-600 text-green-600 rounded hover:bg-green-50"
+                                >
+                                    + Image
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => addSection("quote")}
+                                    className="px-3 py-1 text-sm border border-yellow-600 text-yellow-600 rounded hover:bg-yellow-50"
+                                >
+                                    + Quote
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => addSection("features")}
+                                    className="px-3 py-1 text-sm border border-pink-600 text-pink-600 rounded hover:bg-pink-50"
+                                >
+                                    + Features
+                                </button>
+                            </div>
                         </div>
-                        <div>
-                            <label className="block mb-1 font-medium dark:text-gray-300">Image</label>
-                            <input
-                                type="file"
-                                name="image"
-                                accept="image/*"
-                                onChange={handleChange}
-                                className="w-full"
-                            />
-                            {isEditing && !formData.image && (
-                                <p className="text-sm text-gray-500 mt-1">Leave empty to keep current image</p>
-                            )}
-                        </div>
-                        <div className="flex gap-4">
+
+                        <div className="flex gap-4 pt-4">
                             <button
                                 type="submit"
                                 disabled={loading}
@@ -334,43 +627,107 @@ const BlogManagement = () => {
                 </div>
             )}
 
-            {/* Blog List */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {blogs.map((blog) => (
-                    <div key={blog._id} className="bg-white dark:bg-gray-800 rounded shadow overflow-hidden">
-                        <img
-                            src={blog.image || "https://via.placeholder.com/300"}
-                            alt={blog.heading}
-                            className="w-full h-48 object-cover"
-                        />
-                        <div className="p-4">
-                            <h3 className="text-xl font-bold dark:text-white mb-2 line-clamp-2">{blog.heading}</h3>
-                            <p className="text-gray-600 dark:text-gray-300 text-sm mb-2">By {blog.author}</p>
-                            <div className="flex flex-wrap gap-2 mb-4">
-                                {blog.tags && blog.tags.map((tag, idx) => (
-                                    <span key={idx} className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded dark:bg-blue-900 dark:text-blue-200">
-                                        {tag}
-                                    </span>
-                                ))}
-                            </div>
-                            <div className="flex justify-end gap-2">
-                                <button
-                                    onClick={() => handleEdit(blog)}
-                                    className="px-3 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600"
-                                >
-                                    Edit
-                                </button>
-                                <button
-                                    onClick={() => handleDelete(blog._id)}
-                                    className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600"
-                                >
-                                    Delete
-                                </button>
-                            </div>
-                        </div>
+            {/* Filters */}
+            <div className="bg-white dark:bg-gray-800 p-4 rounded shadow mb-8">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                        <label className="block text-sm font-medium dark:text-gray-300 mb-1">Filter by Category</label>
+                        <select
+                            value={filterCategory}
+                            onChange={(e) => setFilterCategory(e.target.value)}
+                            className="w-full px-3 py-2 border rounded dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                        >
+                            <option value="">All Categories</option>
+                            <option value="Blog">General Blog</option>
+                            <option value="Destination">Destination Content</option>
+                        </select>
                     </div>
-                ))}
+                    <div>
+                        <label className="block text-sm font-medium dark:text-gray-300 mb-1">Filter by Country</label>
+                        <select
+                            value={filterCountry}
+                            onChange={(e) => setFilterCountry(e.target.value)}
+                            className="w-full px-3 py-2 border rounded dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                        >
+                            <option value="">All Countries</option>
+                            <option value="General">General/Global</option>
+                            <option value="India">India</option>
+                            <option value="USA">USA</option>
+                            <option value="UK">UK</option>
+                            <option value="France">France</option>
+                            <option value="Switzerland">Switzerland</option>
+                            <option value="Australia">Australia</option>
+                            <option value="Bali">Bali</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium dark:text-gray-300 mb-1">Filter by Section</label>
+                        <select
+                            value={filterSection}
+                            onChange={(e) => setFilterSection(e.target.value)}
+                            className="w-full px-3 py-2 border rounded dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                        >
+                            <option value="">All Sections</option>
+                            <option value="General">General Blog</option>
+                            <option value="Explorer">Explorer</option>
+                            <option value="States">States/Regions</option>
+                            <option value="Hero">Hero</option>
+                            <option value="Instagram">Instagram</option>
+                            <option value="Testimonials">Testimonials</option>
+                        </select>
+                    </div>
+                </div>
             </div>
+
+            {/* Blog List */}
+            {fetching ? (
+                <div className="text-center py-8">
+                    <p className="text-gray-600 dark:text-gray-400">Loading blogs...</p>
+                </div>
+            ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {Array.isArray(blogs) && blogs.length > 0 ? (
+                        blogs.map((blog) => (
+                            <div key={blog._id} className="bg-white dark:bg-gray-800 rounded shadow overflow-hidden">
+                                <img
+                                    src={blog.image || "https://via.placeholder.com/300"}
+                                    alt={blog.heading}
+                                    className="w-full h-48 object-cover"
+                                />
+                                <div className="p-4">
+                                    <h3 className="text-xl font-bold dark:text-white mb-2 line-clamp-2">{blog.heading}</h3>
+                                    <p className="text-gray-600 dark:text-gray-300 text-sm mb-2">By {blog.author}</p>
+                                    <div className="flex flex-wrap gap-2 mb-4">
+                                        {Array.isArray(blog.tags) && blog.tags.map((tag, idx) => (
+                                            <span key={idx} className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded dark:bg-blue-900 dark:text-blue-200">
+                                                {tag}
+                                            </span>
+                                        ))}
+                                    </div>
+                                    <div className="flex justify-end gap-2">
+                                        <button
+                                            onClick={() => handleEdit(blog)}
+                                            className="px-3 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600"
+                                        >
+                                            Edit
+                                        </button>
+                                        <button
+                                            onClick={() => handleDelete(blog._id)}
+                                            className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600"
+                                        >
+                                            Delete
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        ))
+                    ) : (
+                        <div className="col-span-full text-center py-8">
+                            <p className="text-gray-600 dark:text-gray-400">No blogs found. Create your first blog!</p>
+                        </div>
+                    )}
+                </div>
+            )}
         </div>
     );
 };
