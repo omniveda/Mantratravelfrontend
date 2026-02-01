@@ -24,7 +24,7 @@ export default function Crousal() {
   useEffect(() => {
     const fetchBeaches = async () => {
       try {
-        const res = await axios.get('http://localhost:4000/api/blogs?tag=beaches');
+        const res = await axios.get('https://mantratravelbackend.onrender.com/api/blogs?tag=beaches');
         if (res.data && res.data.length > 0) {
           setBeachesData(res.data.map(blog => ({
             image: blog.image,

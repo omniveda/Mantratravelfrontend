@@ -28,30 +28,32 @@ export default function Instagramhandles({ countryName }) {
         const fetchInstagramData = async () => {
             setLoading(true);
             try {
-                const res = await axios.get(`http://localhost:4000/api/blogs?category=Destination&country=${encodeURIComponent(countryName || 'India')}&section=Instagram`);
+                const countryParam = countryName ? `?country=${encodeURIComponent(countryName)}&fallback=General` : "?country=India&fallback=General";
+
+                // Fetch from specific instagram API
+                const res = await axios.get(`https://mantratravelbackend.onrender.com/api/instagram${countryParam}`);
                 const data = res.data;
 
-                // For the masonry grid (limit to 10)
-                const classNames = [
-                    "md:col-span-2 md:row-span-2", "md:col-span-1 md:row-span-1", "md:col-span-1 md:row-span-1",
-                    "md:col-span-1 md:row-span-1", "md:col-span-1 md:row-span-1", "md:col-span-1 md:row-span-1",
-                    "md:col-span-1 md:row-span-1", "md:col-span-2 md:row-span-2", "md:col-span-1 md:row-span-1",
-                    "md:col-span-1 md:row-span-1"
-                ];
+                if (data && data.length > 0) {
+                    const classNames = [
+                        "md:col-span-2 md:row-span-2", "md:col-span-1 md:row-span-1", "md:col-span-1 md:row-span-1",
+                        "md:col-span-1 md:row-span-1", "md:col-span-1 md:row-span-1", "md:col-span-1 md:row-span-1",
+                        "md:col-span-1 md:row-span-1", "md:col-span-2 md:row-span-2", "md:col-span-1 md:row-span-1",
+                        "md:col-span-1 md:row-span-1"
+                    ];
 
-                const mappedPhotos = data.slice(0, 10).map((item, index) => ({
-                    id: item._id,
-                    img: item.image,
-                    alt: item.heading,
-                    link: item.externalLink,
-                    className: classNames[index] || "md:col-span-1 md:row-span-1"
-                }));
+                    const mappedPhotos = data.slice(0, 10).map((item, index) => ({
+                        id: item._id,
+                        img: item.image,
+                        alt: item.name,
+                        link: item.link,
+                        className: classNames[index] || "md:col-span-1 md:row-span-1"
+                    }));
+                    setPhotos(mappedPhotos);
+                }
 
-                setPhotos(mappedPhotos);
-
-                // For the states grid (items after the first 10, or all if preferred)
-                // Actually, let's fetch "States" section for the states grid
-                const statesRes = await axios.get(`http://localhost:4000/api/blogs?category=Destination&country=${encodeURIComponent(countryName || 'India')}&section=States`);
+                // Keep States fetching from blogs as it relates to geographical sections
+                const statesRes = await axios.get(`https://mantratravelbackend.onrender.com/api/blogs?category=Destination&country=${encodeURIComponent(countryName || 'India')}&section=States&fallback=General`);
                 const mappedStates = statesRes.data.map(item => ({
                     title: item.heading,
                     img: item.image,

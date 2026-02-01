@@ -35,7 +35,7 @@ export default function CountryExplore({ countryName, onBack }) {
     const fetchDestinationData = async () => {
       setLoading(true);
       try {
-        const res = await axios.get(`http://localhost:4000/api/blogs?category=Destination&country=${encodeURIComponent(countryName || 'India')}`);
+        const res = await axios.get(`https://mantratravelbackend.onrender.com/api/blogs?category=Destination&country=${encodeURIComponent(countryName || 'India')}`);
         const blogs = res.data;
 
         // Group blogs by section
@@ -316,7 +316,7 @@ export default function CountryExplore({ countryName, onBack }) {
             {/* Background light effect */}
             <div className="absolute top-0 right-0 w-96 h-96 bg-orange-500/10 blur-[100px] rounded-full"></div>
             <div className="absolute bottom-0 left-0 w-96 h-96 bg-blue-500/10 blur-[100px] rounded-full"></div>
-            <SeasonalGuide />
+            <SeasonalGuide country={countryName} />
           </section>
 
           <div className="transform hover:scale-[1.01] transition-transform duration-700">
@@ -380,7 +380,7 @@ export default function CountryExplore({ countryName, onBack }) {
           </div>
 
           <div className="space-y-40">
-            <TravellersStory />
+            <TravellersStory countryName={countryName} />
             <Adventures />
             <IncredibleMoments />
             <Instagramhandles countryName={countryName} />

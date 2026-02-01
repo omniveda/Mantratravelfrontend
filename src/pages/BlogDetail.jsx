@@ -14,8 +14,8 @@ const BlogDetail = () => {
         const fetchData = async () => {
             try {
                 const [blogRes, allBlogsRes] = await Promise.all([
-                    axios.get(`http://localhost:4000/api/blogs/${id}`),
-                    axios.get(`http://localhost:4000/api/blogs`)
+                    axios.get(`https://mantratravelbackend.onrender.com/api/blogs/${id}`),
+                    axios.get(`https://mantratravelbackend.onrender.com/api/blogs`)
                 ]);
                 setBlog(blogRes.data);
 

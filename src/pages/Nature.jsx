@@ -13,7 +13,7 @@ export default function Nature() {
     useEffect(() => {
         const fetchBlogs = async () => {
             try {
-                const res = await axios.get('http://localhost:4000/api/blogs?tag=nature');
+                const res = await axios.get('https://mantratravelbackend.onrender.com/api/blogs?tag=nature');
                 if (Array.isArray(res.data)) {
                     setBlogs(res.data);
                 } else {

@@ -54,7 +54,7 @@ const destinationPicks = [
   }
 
 ];
-export default function SeasonalGuide() {
+export default function SeasonalGuide({ country = "India" }) {
   const navigate = useNavigate();
   const [dynamicPicks, setDynamicPicks] = useState(destinationPicks);
   const [historyBlogs, setHistoryBlogs] = useState([]);
@@ -63,8 +63,11 @@ export default function SeasonalGuide() {
   useEffect(() => {
     const fetchBlogs = async () => {
       try {
+        const countryParam = country ? `&country=${encodeURIComponent(country)}` : "";
+        const fallbackParam = "&fallback=General";
+
         // Fetch destination picks
-        const destRes = await axios.get('http://localhost:4000/api/blogs?tag=destinations');
+        const destRes = await axios.get(`https://mantratravelbackend.onrender.com/api/blogs?tag=destinations${countryParam}${fallbackParam}`);
         if (destRes.data && destRes.data.length > 0) {
           setDynamicPicks(destRes.data.map(blog => ({
             title: blog.heading,
@@ -74,7 +77,7 @@ export default function SeasonalGuide() {
         }
 
         // Fetch history & heritage blogs
-        const historyRes = await axios.get('http://localhost:4000/api/blogs?tag=historyheritage');
+        const historyRes = await axios.get(`https://mantratravelbackend.onrender.com/api/blogs?tag=historyheritage${countryParam}${fallbackParam}`);
         if (historyRes.data && historyRes.data.length > 0) {
           setHistoryBlogs(historyRes.data.map(blog => ({
             title: blog.heading,
@@ -84,7 +87,7 @@ export default function SeasonalGuide() {
         }
 
         // Fetch animal blogs
-        const animalRes = await axios.get('http://localhost:4000/api/blogs?tag=animals');
+        const animalRes = await axios.get(`https://mantratravelbackend.onrender.com/api/blogs?tag=animals${countryParam}${fallbackParam}`);
         if (animalRes.data && animalRes.data.length > 0) {
           setAnimalBlogs(animalRes.data.map(blog => ({
             title: blog.heading,
@@ -97,8 +100,7 @@ export default function SeasonalGuide() {
       }
     };
     fetchBlogs();
-  }, []);
-
+  }, [country]);
 
 
   const scroll = (direction) => {

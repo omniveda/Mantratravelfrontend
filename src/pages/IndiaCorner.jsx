@@ -31,14 +31,19 @@ export default function IndiaCorner() {
   const navigate = useNavigate();
   const [dynamicData, setDynamicData] = useState({});
   const [loading, setLoading] = useState(true);
-  const [heroSections, setHeroSections] = useState({ hero1: hero1_def, hero2: hero2_def });
+  const [heroSections, setHeroSections] = useState({
+    hero1: hero1_def,
+    hero1Id: null,
+    hero2: hero2_def,
+    hero2Id: null
+  });
   const [testimonials, setTestimonials] = useState([]);
 
   useEffect(() => {
     const fetchIndiaData = async () => {
       setLoading(true);
       try {
-        const res = await axios.get(`http://localhost:4000/api/blogs?category=Destination&country=India`);
+        const res = await axios.get(`https://mantratravelbackend.onrender.com/api/blogs?category=Destination&country=India`);
         const blogs = res.data;
 
         // Group blogs by section
@@ -58,7 +63,9 @@ export default function IndiaCorner() {
         if (heroBlogs.length > 0) {
           setHeroSections({
             hero1: heroBlogs[0].image || hero1_def,
-            hero2: heroBlogs[heroBlogs.length - 1].image || hero2_def
+            hero1Id: heroBlogs[0]._id,
+            hero2: heroBlogs[heroBlogs.length - 1].image || hero2_def,
+            hero2Id: heroBlogs[heroBlogs.length - 1]._id
           });
         }
 
@@ -110,7 +117,7 @@ export default function IndiaCorner() {
   }
 
   return (
-    <section className="bg-[#fcfbf9] py-16 md:py-24 px-4 text-center min-h-screen">
+    <section className="bg-[#fcfbf9] py-16 md:py-24 text-center min-h-screen max-w-[1440px] mx-auto px-4 md:px-12 lg:px-20">
 
       {/* INDIA HEADING - Premium Gradient & Animated Typography */}
       <div className="mb-20 relative animate-fade-in flex flex-col items-center">
@@ -184,12 +191,15 @@ export default function IndiaCorner() {
         ))}
       </div>
 
-      <section className="p-0 text-center rounded-[3rem] overflow-hidden shadow-2xl mx-4">
+      <section className="p-0 text-center rounded-[3rem] overflow-hidden shadow-2xl">
         <div className="flex flex-col h-auto md:min-h-[1200px]">
           {/* Top Half */}
           <div
-            className="w-full relative bg-cover bg-center h-[50vh] md:h-auto md:flex-1 group"
+            className={`w-full relative bg-cover bg-center h-[50vh] md:h-auto md:flex-1 group ${heroSections.hero1Id ? 'cursor-pointer' : ''}`}
             style={{ backgroundImage: `url(${heroSections.hero1})` }}
+            onClick={() => {
+              if (heroSections.hero1Id) navigate(`/blog/${heroSections.hero1Id}`);
+            }}
           >
             <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors"></div>
             <div className="absolute top-[5%] left-0 w-full flex flex-wrap justify-center md:justify-around items-center bg-black/40 backdrop-blur-md py-4 md:py-6 gap-4 md:gap-0 z-10 border-y border-white/10">
@@ -211,8 +221,11 @@ export default function IndiaCorner() {
 
           {/* Bottom Half */}
           <div
-            className="w-full relative bg-cover bg-center h-[60vh] md:h-auto md:flex-1 overflow-hidden"
+            className={`w-full relative bg-cover bg-center h-[60vh] md:h-auto md:flex-1 overflow-hidden ${heroSections.hero2Id ? 'cursor-pointer' : ''}`}
             style={{ backgroundImage: `url(${heroSections.hero2})` }}
+            onClick={() => {
+              if (heroSections.hero2Id) navigate(`/blog/${heroSections.hero2Id}`);
+            }}
           >
             <div className="absolute inset-0 bg-gradient-to-b from-black/40 to-black/80"></div>
             <div className="relative h-full flex flex-col items-center justify-center text-white text-center w-full px-6 z-10 py-20 text-center">
@@ -253,11 +266,11 @@ export default function IndiaCorner() {
 
       {/* SHARED COMPONENTS SECTION */}
       <div className="space-y-32 pb-40">
-        <section className="bg-slate-950 px-6 py-24 md:py-32 rounded-[4rem] mx-4 relative overflow-hidden">
+        <section className="bg-slate-950 px-6 py-24 md:py-32 rounded-[4rem] relative overflow-hidden">
           {/* Background light effect */}
           <div className="absolute top-0 right-0 w-96 h-96 bg-orange-500/10 blur-[100px] rounded-full"></div>
           <div className="absolute bottom-0 left-0 w-96 h-96 bg-blue-500/10 blur-[100px] rounded-full"></div>
-          <SeasonalGuide />
+          <SeasonalGuide country="India" />
         </section>
 
         <div className="transform hover:scale-[1.01] transition-transform duration-700">
@@ -288,11 +301,14 @@ export default function IndiaCorner() {
                   <p style={{ fontFamily: "'Georgia', serif" }} className="text-2xl md:text-[2.2rem] leading-relaxed text-slate-600 mb-12 italic text-center">
                     "{testimonials[0].description}"
                   </p>
-                  <div className="flex flex-col items-center">
-                    <div className="w-24 h-24 rounded-full bg-slate-100 overflow-hidden border-4 border-orange-500 shadow-2xl mb-6">
+                  <div
+                    onClick={() => navigate(`/blog/${testimonials[0]._id}`)}
+                    className="flex flex-col items-center cursor-pointer group"
+                  >
+                    <div className="w-24 h-24 rounded-full bg-slate-100 overflow-hidden border-4 border-orange-500 shadow-2xl mb-6 group-hover:scale-110 transition-transform duration-300">
                       <img src={testimonials[0].image || nature} alt='avatar' className="w-full h-full object-cover" />
                     </div>
-                    <p className="text-xl text-slate-900 font-black tracking-widest uppercase">— {testimonials[0].author} —</p>
+                    <p className="text-xl text-slate-900 font-black tracking-widest uppercase group-hover:text-orange-600 transition-colors">— {testimonials[0].author} —</p>
                   </div>
                 </>
               ) : (
@@ -314,19 +330,19 @@ export default function IndiaCorner() {
           </div>
         </div>
 
-        <div className="bg-white rounded-[4rem] py-20 px-4 shadow-sm border border-gray-100 mx-4">
+        <div className="bg-white rounded-[4rem] py-20 px-4 shadow-sm border border-gray-100">
           <Destination />
         </div>
 
         <div className="space-y-40">
-          <TravellersStory />
+          <TravellersStory countryName="India" />
           <Adventures />
           <IncredibleMoments />
           <Instagramhandles countryName="India" />
           <ExploreReason />
         </div>
 
-        <div className="px-6">
+        <div>
           <div className="bg-slate-900 rounded-[3rem] p-1 shadow-2xl overflow-hidden">
             <div className="bg-white/5 backdrop-blur-md rounded-[2.8rem] py-12">
               <TravelBook />

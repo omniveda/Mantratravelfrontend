@@ -21,7 +21,7 @@ const Home = () => {
   useEffect(() => {
     const fetchExploreBlogs = async () => {
       try {
-        const res = await axios.get('http://localhost:4000/api/blogs?tag=explore');
+        const res = await axios.get('https://mantratravelbackend.onrender.com/api/blogs?tag=explore');
         const formattedBlogs = res.data.map(blog => ({
           id: blog._id,
           title: blog.heading,
