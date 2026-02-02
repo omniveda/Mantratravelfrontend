@@ -31,7 +31,7 @@ export default function Instagramhandles({ countryName }) {
                 const countryParam = countryName ? `?country=${encodeURIComponent(countryName)}&fallback=General` : "?country=India&fallback=General";
 
                 // Fetch from specific instagram API
-                const res = await axios.get(`https://mantratravelbackend.onrender.com/api/instagram${countryParam}`);
+                const res = await axios.get(`http://localhost:4000/api/instagram${countryParam}`);
                 const data = res.data;
 
                 if (data && data.length > 0) {
@@ -52,16 +52,25 @@ export default function Instagramhandles({ countryName }) {
                     setPhotos(mappedPhotos);
                 }
 
-                // Keep States fetching from blogs as it relates to geographical sections
-                const statesRes = await axios.get(`https://mantratravelbackend.onrender.com/api/blogs?category=Destination&country=${encodeURIComponent(countryName || 'India')}&section=States&fallback=General`);
+                // Fetch regional instagram accounts (States) from the new tags API
+                const statesRes = await axios.get(`http://localhost:4000/api/instagram/tags?tags=${encodeURIComponent(countryName || 'India')}`);
                 const mappedStates = statesRes.data.map(item => ({
-                    title: item.heading,
+                    title: item.name,
                     img: item.image,
-                    link: item.externalLink
+                    link: item.link
                 }));
 
                 if (mappedStates.length > 0) {
                     setStates(mappedStates);
+                } else {
+                    // Fallback: Fetch all instagram accounts if no regional ones found
+                    const allRes = await axios.get(`http://localhost:4000/api/instagram${countryParam}`);
+                    const allMapped = allRes.data.map(item => ({
+                        title: item.name,
+                        img: item.image,
+                        link: item.link
+                    }));
+                    setStates(allMapped);
                 }
 
             } catch (err) {
@@ -88,23 +97,10 @@ export default function Instagramhandles({ countryName }) {
         { id: 10, img: india4, alt: "Taj Detail", className: "md:col-span-1 md:row-span-1" },
     ];
 
-    const stateFallbacks = [
-        { title: "Artful Andhra", img: india1 },
-        { title: "Auburn Arunachal", img: northeast },
-        { title: "Aromatic Assam", img: india3 },
-        { title: "Benedictive Bihar", img: india5 },
-        { title: "Cryptic Chhattisgarh", img: nature },
-        { title: "Glorious Goa", img: western },
-        { title: "Grandiose Gujarat", img: india2 },
-        { title: "Heroic Haryana", img: india4 },
-        { title: "Heavenly Himachal", img: northern },
-        { title: "Kaleidoscopic Karnataka", img: south },
-        { title: "Karmic Kerala", img: eastern },
-        { title: "Mystical Madhya", img: central },
-    ];
+
 
     const displayPhotos = photos.length > 0 ? photos : photoFallbacks;
-    const displayStates = states.length > 0 ? states : stateFallbacks;
+    const displayStates = states.length > 0 ? states : [];
     return (
         <div className="w-full">
             {/* 1. WALL OF FRAME SECTION */}

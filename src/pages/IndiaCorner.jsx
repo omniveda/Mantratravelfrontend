@@ -43,7 +43,7 @@ export default function IndiaCorner() {
     const fetchIndiaData = async () => {
       setLoading(true);
       try {
-        const res = await axios.get(`https://mantratravelbackend.onrender.com/api/blogs?category=Destination&country=India`);
+        const res = await axios.get(`http://localhost:4000/api/blogs?category=Destination&country=India`);
         const blogs = res.data;
 
         // Group blogs by section
@@ -270,7 +270,7 @@ export default function IndiaCorner() {
           {/* Background light effect */}
           <div className="absolute top-0 right-0 w-96 h-96 bg-orange-500/10 blur-[100px] rounded-full"></div>
           <div className="absolute bottom-0 left-0 w-96 h-96 bg-blue-500/10 blur-[100px] rounded-full"></div>
-          <SeasonalGuide country="India" />
+          <SeasonalGuide country="india" />
         </section>
 
         <div className="transform hover:scale-[1.01] transition-transform duration-700">

@@ -19,7 +19,7 @@ const InstagramManagement = () => {
     const fetchInstagrams = async () => {
         setFetching(true);
         try {
-            const res = await axios.get("https://mantratravelbackend.onrender.com/api/instagram");
+            const res = await axios.get("http://localhost:4000/api/instagram");
             setInstagrams(res.data);
         } catch (err) {
             console.error("Error fetching instagram accounts", err);
@@ -68,10 +68,10 @@ const InstagramManagement = () => {
             };
 
             if (isEditing) {
-                await axios.put(`https://mantratravelbackend.onrender.com/api/instagram/${currentId}`, data, config);
+                await axios.put(`http://localhost:4000/api/instagram/${currentId}`, data, config);
                 alert("Instagram account updated!");
             } else {
-                await axios.post("https://mantratravelbackend.onrender.com/api/instagram", data, config);
+                await axios.post("http://localhost:4000/api/instagram", data, config);
                 alert("Instagram account added!");
             }
 
@@ -89,7 +89,7 @@ const InstagramManagement = () => {
         if (!window.confirm("Are you sure?")) return;
         try {
             const token = localStorage.getItem("token");
-            await axios.delete(`https://mantratravelbackend.onrender.com/api/instagram/${id}`, {
+            await axios.delete(`http://localhost:4000/api/instagram/${id}`, {
                 headers: { "x-auth-token": token },
             });
             fetchInstagrams();

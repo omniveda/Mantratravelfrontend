@@ -29,7 +29,7 @@ export default function Destination() {
   useEffect(() => {
     const fetchWonders = async () => {
       try {
-        const res = await axios.get('https://mantratravelbackend.onrender.com/api/blogs?tag=wonders');
+        const res = await axios.get('http://localhost:4000/api/blogs?tag=wonders');
         if (res.data && res.data.length > 0) {
           setDynamicDestinations(res.data.map(blog => ({
             img: blog.image,

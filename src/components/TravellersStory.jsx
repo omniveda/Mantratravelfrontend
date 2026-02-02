@@ -18,7 +18,7 @@ export default function TravellersStory({ countryName }) {
             setLoading(true);
             try {
                 const countryParam = countryName ? `?country=${encodeURIComponent(countryName)}&fallback=General` : "?country=India&fallback=General";
-                const res = await axios.get(`https://mantratravelbackend.onrender.com/api/instagram${countryParam}`);
+                const res = await axios.get(`http://localhost:4000/api/instagram${countryParam}`);
                 let data = res.data;
 
                 if (data && data.length > 0) {

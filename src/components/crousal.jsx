@@ -8,23 +8,17 @@ import Beau_beac3 from '../assets/Home_page/Beau_beac3.png';
 import Beau_beac4 from '../assets/Home_page/Beau_beac4.png';
 import Beau_beac5 from '../assets/Home_page/Beau_beac5.png';
 
-const CrousalImages = [
-  Beau_beac1,
-  Beau_beac2,
-  Beau_beac3,
-  Beau_beac4,
-  Beau_beac5,
-];
 
-export default function Crousal() {
+
+export default function Crousal({ country }) {
   const navigate = useNavigate();
-  const [beachesData, setBeachesData] = useState(CrousalImages.map(img => ({ image: img })));
+  const [beachesData, setBeachesData] = useState([]);
   const [current, setCurrent] = useState(0);
 
   useEffect(() => {
     const fetchBeaches = async () => {
       try {
-        const res = await axios.get('https://mantratravelbackend.onrender.com/api/blogs?tag=beaches');
+        const res = await axios.get(`http://localhost:4000/api/blogs/tags?tags=beaches,${encodeURIComponent(country)}`);
         if (res.data && res.data.length > 0) {
           setBeachesData(res.data.map(blog => ({
             image: blog.image,
@@ -37,17 +31,39 @@ export default function Crousal() {
       }
     };
     fetchBeaches();
-  }, []);
+  }, [country]);
 
   const next = () => {
     setCurrent((prev) => (prev + 1) % beachesData.length);
   };
 
   const prev = () => {
-    setCurrent((prev) =>
-      prev === 0 ? beachesData.length - 1 : prev - 1
-    );
+    // Only advance if there's data
+    if (beachesData.length > 0) {
+      setCurrent((prev) =>
+        prev === 0 ? beachesData.length - 1 : prev - 1
+      );
+    }
   };
+
+  useEffect(() => {
+    // Only set interval if there's data
+    if (beachesData.length > 0) {
+      const timer = setInterval(next, 3000);
+      return () => clearInterval(timer);
+    }
+    return () => { }; // Return an empty cleanup function if no data
+  }, [beachesData.length]); // Added dependency to re-interval if data length changes
+
+  // Add early return if no data to prevent crash
+  if (beachesData.length === 0) {
+    return (
+      <div className="text-white text-center py-20 mt-[6rem] border border-white/20 rounded-lg w-full max-w-4xl mx-auto backdrop-blur-sm bg-white/5">
+        <h3 className="text-xl font-semibold opacity-80">No beauty beaches found for {country}</h3>
+        <p className="mt-2 opacity-60">We couldn't find any blogs matching these tags for the selected region.</p>
+      </div>
+    );
+  }
 
   // Get 5 visible slides (2 left, center, 2 right)
   const visibleSlides = [
@@ -57,13 +73,6 @@ export default function Crousal() {
     beachesData[(current + 1) % beachesData.length],
     beachesData[(current + 2) % beachesData.length],
   ];
-
-  useEffect(() => {
-    const timer = setInterval(next, 3000);
-    return () => clearInterval(timer);
-  }, [beachesData.length]); // Added dependency to re-interval if data length changes
-
-
 
   return (
     <>

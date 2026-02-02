@@ -27,38 +27,39 @@ const met_wild = [
   met_whild5,
 ];
 
-const destinationPicks = [
-  {
-    title: "10 ROMANTIC LAKE SPOTS FOR COUPLES",
-    image: Dest1,
-  },
-  {
-    title: "THE ULTIMATE TRAVEL BUCKET LIST",
-    image: Dest2,
-  },
-  {
-    title: "AMAZING ROAD TRIPS AROUND THE WORLD",
-    image: Dest3,
-  },
-  {
-    title: "DISCOVER THE MOST MAGICAL SUNSETS OF THE WORLD",
-    image: Dest4,
-  },
-  {
-    title: "TOP 10 JUNGLE GETAWAYS",
-    image: Dest5,
-  },
-  {
-    title: "TOP 10 HOTTEST BEACHES OF THE WORLD",
-    image: Dest6,
-  }
+// const destinationPicks = [
+//   {
+//     title: "10 ROMANTIC LAKE SPOTS FOR COUPLES",
+//     image: Dest1,
+//   },
+//   {
+//     title: "THE ULTIMATE TRAVEL BUCKET LIST",
+//     image: Dest2,
+//   },
+//   {
+//     title: "AMAZING ROAD TRIPS AROUND THE WORLD",
+//     image: Dest3,
+//   },
+//   {
+//     title: "DISCOVER THE MOST MAGICAL SUNSETS OF THE WORLD",
+//     image: Dest4,
+//   },
+//   {
+//     title: "TOP 10 JUNGLE GETAWAYS",
+//     image: Dest5,
+//   },
+//   {
+//     title: "TOP 10 HOTTEST BEACHES OF THE WORLD",
+//     image: Dest6,
+//   }
 
-];
-export default function SeasonalGuide({ country = "India" }) {
+// ];
+export default function SeasonalGuide({ country = "india" }) {
   const navigate = useNavigate();
-  const [dynamicPicks, setDynamicPicks] = useState(destinationPicks);
+  const [dynamicPicks, setDynamicPicks] = useState([]);
   const [historyBlogs, setHistoryBlogs] = useState([]);
   const [animalBlogs, setAnimalBlogs] = useState([]);
+  const [tapestryBlog, setTapestryBlog] = useState(null);
 
   useEffect(() => {
     const fetchBlogs = async () => {
@@ -67,7 +68,8 @@ export default function SeasonalGuide({ country = "India" }) {
         const fallbackParam = "&fallback=General";
 
         // Fetch destination picks
-        const destRes = await axios.get(`https://mantratravelbackend.onrender.com/api/blogs?tag=destinations${countryParam}${fallbackParam}`);
+        const destRes = await axios.get(`http://localhost:4000/api/blogs/tags?tags=destinations,${encodeURIComponent(country)}`);
+        console.log(destRes.data);
         if (destRes.data && destRes.data.length > 0) {
           setDynamicPicks(destRes.data.map(blog => ({
             title: blog.heading,
@@ -77,7 +79,7 @@ export default function SeasonalGuide({ country = "India" }) {
         }
 
         // Fetch history & heritage blogs
-        const historyRes = await axios.get(`https://mantratravelbackend.onrender.com/api/blogs?tag=historyheritage${countryParam}${fallbackParam}`);
+        const historyRes = await axios.get(`http://localhost:4000/api/blogs/tags?tags=historyheritage,${encodeURIComponent(country)}`);
         if (historyRes.data && historyRes.data.length > 0) {
           setHistoryBlogs(historyRes.data.map(blog => ({
             title: blog.heading,
@@ -87,13 +89,23 @@ export default function SeasonalGuide({ country = "India" }) {
         }
 
         // Fetch animal blogs
-        const animalRes = await axios.get(`https://mantratravelbackend.onrender.com/api/blogs?tag=animals${countryParam}${fallbackParam}`);
+        const animalRes = await axios.get(`http://localhost:4000/api/blogs/tags?tags=animals,${encodeURIComponent(country)}`);
         if (animalRes.data && animalRes.data.length > 0) {
           setAnimalBlogs(animalRes.data.map(blog => ({
             title: blog.heading,
             image: blog.image,
             id: blog._id
           })));
+        }
+
+        // Fetch tapestry blog
+        const tapestryRes = await axios.get(`http://localhost:4000/api/blogs/tags?tags=tapestry,${encodeURIComponent(country)}`);
+        if (tapestryRes.data && tapestryRes.data.length > 0) {
+          setTapestryBlog({
+            title: tapestryRes.data[0].heading,
+            image: tapestryRes.data[0].image,
+            id: tapestryRes.data[0]._id
+          });
         }
       } catch (err) {
         console.error("Error fetching blogs in SeasonalGuide.js:", err);
@@ -129,8 +141,9 @@ export default function SeasonalGuide({ country = "India" }) {
             <div
               key={index}
               className="flex gap-4 md:gap-[20px] mt-[20px] md:mt-[30px] items-center md:items-start cursor-pointer group"
-              onClick={() => pick.id && navigate(`/blog/${pick.id}`)}
+              onClick={() => navigate(pick.id ? `/blog/${pick.id}` : '/blog')}
             >
+
               <img
                 src={pick.image}
                 alt={pick.title}
@@ -138,30 +151,44 @@ export default function SeasonalGuide({ country = "India" }) {
               />
               <div className="flex-1 text-lg md:text-[1.3rem] flex flex-col justify-between text-gray-300">
                 <p className='text-sm md:text-base opacity-80 group-hover:text-white transition-colors'>EXPLORE</p>
-                <p className="leading-tight group-hover:text-white transition-colors">{pick.title}</p>
+                <p className="leading-tight group-hover:text-white transition-colors cursor-pointer">{pick.title}</p>
               </div>
             </div>
           ))}
 
 
-          <p className='underline mt-[30px] md:mt-[40px] text-xl md:text-[1.3rem] text-gray-300 cursor-pointer text-center md:text-left'>SEE MORE</p>
+          <p
+            className='underline mt-[30px] md:mt-[40px] text-xl md:text-[1.3rem] text-gray-300 cursor-pointer text-center md:text-left hover:text-white transition-colors'
+            onClick={() => navigate('/blog')}
+          >
+            SEE MORE
+          </p>
         </div>
 
         {/* Right Column: Image Grid */}
         <div className="w-full md:w-[65%] flex flex-col gap-6 md:gap-[5%]">
           {/* Top Large Image */}
-          <div className='h-[300px] md:h-[50%] relative group overflow-hidden rounded-lg'>
+          <div
+            className='h-[300px] md:h-[50%] relative group overflow-hidden rounded-lg cursor-pointer'
+            onClick={() => tapestryBlog?.id && navigate(`/blog/${tapestryBlog.id}`)}
+          >
             <img
-              src={Sea_tapes}
+              src={tapestryBlog?.image || Sea_tapes}
               alt="Tapestry"
               className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
             />
             <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-colors" />
             <div className="absolute bottom-6 left-6 text-left">
               <h2 className="text-2xl md:text-[2.5rem] font-bold leading-tight uppercase max-w-[90%] md:max-w-[80%] drop-shadow-lg">
-                A TAPESTRY WOVEN WITH COUNTLESS
+                {tapestryBlog?.title || "A TAPESTRY WOVEN WITH COUNTLESS"}
               </h2>
-              <button className="mt-4 text-sm font-bold tracking-widest uppercase hover:text-gray-300 transition-colors">
+              <button
+                className="mt-4 text-sm font-bold tracking-widest uppercase hover:text-gray-300 transition-colors border-b-2 border-white pb-1"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  navigate(tapestryBlog?.id ? `/blog/${tapestryBlog.id}` : '/blog');
+                }}
+              >
                 Read
               </button>
             </div>
@@ -171,7 +198,7 @@ export default function SeasonalGuide({ country = "India" }) {
           <div className='flex flex-col md:flex-row h-auto md:h-[50%] gap-6 md:gap-[5%]'>
             <div
               className='w-full md:w-[50%] flex flex-col gap-4 md:gap-[5%] h-[400px] md:h-auto cursor-pointer group'
-              onClick={() => historyBlogs[0]?.id && navigate(`/blog/${historyBlogs[0].id}`)}
+              onClick={() => navigate(historyBlogs[0]?.id ? `/blog/${historyBlogs[0].id}` : '/blog')}
             >
               <div className='h-[60%] overflow-hidden rounded-lg'>
                 <img
@@ -185,20 +212,36 @@ export default function SeasonalGuide({ country = "India" }) {
                 <h2 className='text-black text-lg md:text-[1.3rem] font-bold leading-tight mt-1 group-hover:underline'>
                   {historyBlogs[0]?.title || "WORLD HERITAGE: OUR RETURN AND THE FUTURE’S TREASURE"}
                 </h2>
-                <p className='text-black font-semibold mt-2 hover:underline'>READ</p>
+                <p
+                  className='text-black font-semibold mt-2 hover:underline cursor-pointer'
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    navigate(historyBlogs[0]?.id ? `/blog/${historyBlogs[0].id}` : '/blog');
+                  }}
+                >
+                  READ
+                </p>
               </div>
             </div>
 
             <div
               className='w-full md:w-[50%] flex flex-col-reverse md:flex-col gap-4 md:gap-[5%] h-[400px] md:h-auto cursor-pointer group'
-              onClick={() => historyBlogs[1]?.id && navigate(`/blog/${historyBlogs[1].id}`)}
+              onClick={() => navigate(historyBlogs[1]?.id ? `/blog/${historyBlogs[1].id}` : '/blog')}
             >
               <div className='flex-1 bg-white text-left p-4 md:px-[1.2rem] rounded-lg text-black'>
                 <h2 className='text-gray-500 text-lg md:text-[1.3rem] font-bold'>HISTORY & HERITAGE</h2>
                 <h2 className='text-black text-lg md:text-[1.3rem] font-bold leading-tight mt-1 group-hover:underline'>
                   {historyBlogs[1]?.title || "“KEEP THE WILD WILD!” – CELEBRATES FREEDOM"}
                 </h2>
-                <p className='text-black text-right font-semibold mt-2 hover:underline'>READ</p>
+                <p
+                  className='text-black text-right font-semibold mt-2 hover:underline cursor-pointer'
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    navigate(historyBlogs[1]?.id ? `/blog/${historyBlogs[1].id}` : '/blog');
+                  }}
+                >
+                  READ
+                </p>
               </div>
               <div className='h-[60%] overflow-hidden rounded-lg'>
                 <img
@@ -219,7 +262,10 @@ export default function SeasonalGuide({ country = "India" }) {
           <h2 className="text-xl md:text-[1.5rem] font-semibold uppercase">
             Meet the Wild: Close and Real
           </h2>
-          <button className="text-xs md:text-sm tracking-widest hover:opacity-80">
+          <button
+            className="text-xs md:text-sm tracking-widest hover:opacity-80"
+            onClick={() => navigate('/blog')}
+          >
             SEE MORE
           </button>
         </div>
@@ -242,7 +288,7 @@ export default function SeasonalGuide({ country = "India" }) {
               <div
                 key={i}
                 className="min-w-[200px] md:min-w-[240px] h-[300px] md:h-[360px] rounded-lg overflow-hidden flex-shrink-0 cursor-pointer group relative"
-                onClick={() => navigate(`/blog/${blog.id}`)}
+                onClick={() => navigate(blog.id ? `/blog/${blog.id}` : '/blog')}
               >
                 <img
                   src={blog.image}
@@ -254,18 +300,7 @@ export default function SeasonalGuide({ country = "India" }) {
                 </div>
               </div>
             ))
-            : [...met_wild, ...met_wild].map((img, i) => (
-              <div
-                key={i}
-                className="min-w-[200px] md:min-w-[240px] h-[300px] md:h-[360px] rounded-lg overflow-hidden flex-shrink-0"
-              >
-                <img
-                  src={img}
-                  alt="wildlife"
-                  className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-                />
-              </div>
-            ))
+            : <div><p className='text-white text-center'>No blogs found</p></div>
           }
         </div>
 
@@ -286,7 +321,7 @@ export default function SeasonalGuide({ country = "India" }) {
       </div>
 
       <div className='text-white md:mt-[6rem] flex justify-center'>
-        <Crousal />
+        <Crousal country={country} />
       </div>
 
     </div>

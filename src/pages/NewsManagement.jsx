@@ -31,7 +31,7 @@ export default function NewsManagement() {
     const fetchNews = async () => {
         setFetching(true);
         try {
-            const res = await axios.get("https://mantratravelbackend.onrender.com/api/news");
+            const res = await axios.get("http://localhost:4000/api/news");
             // Ensure we always set an array, even if API returns different format
             const newsData = res.data;
             if (Array.isArray(newsData)) {
@@ -142,10 +142,10 @@ export default function NewsManagement() {
                 headers: { "Content-Type": "multipart/form-data" },
             };
             if (isEditing) {
-                await axios.put(`https://mantratravelbackend.onrender.com/api/news/${currentNewsId}`, data, config);
+                await axios.put(`http://localhost:4000/api/news/${currentNewsId}`, data, config);
                 alert("News updated successfully");
             } else {
-                await axios.post("https://mantratravelbackend.onrender.com/api/news", data, config);
+                await axios.post("http://localhost:4000/api/news", data, config);
                 alert("News created successfully");
             }
             fetchNews();
@@ -199,7 +199,7 @@ export default function NewsManagement() {
         if (!window.confirm("Are you sure you want to delete this news?")) return;
         setLoading(true);
         try {
-            await axios.delete(`https://mantratravelbackend.onrender.com/api/news/${id}`);
+            await axios.delete(`http://localhost:4000/api/news/${id}`);
             alert("News deleted");
             fetchNews();
         } catch (err) {

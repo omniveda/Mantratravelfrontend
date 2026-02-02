@@ -68,7 +68,7 @@ export default function Holiday() {
   useEffect(() => {
     const fetchBlogs = async () => {
       try {
-        const res = await axios.get('https://mantratravelbackend.onrender.com/api/blogs');
+        const res = await axios.get('http://localhost:4000/api/blogs');
         const allBlogs = res.data;
 
         const updatedContinents = initialContinents.map(continent => {

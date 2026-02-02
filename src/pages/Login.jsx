@@ -17,7 +17,7 @@ const Login = () => {
         console.log("Login attempt started", { email });
 
         try {
-            const res = await axios.post("https://mantratravelbackend.onrender.com/api/auth/login", { email, password });
+            const res = await axios.post("http://localhost:4000/api/auth/login", { email, password });
             console.log("Login successful", res.data);
 
             localStorage.setItem("token", res.data.token);

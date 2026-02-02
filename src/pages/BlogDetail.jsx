@@ -14,8 +14,8 @@ const BlogDetail = () => {
         const fetchData = async () => {
             try {
                 const [blogRes, allBlogsRes] = await Promise.all([
-                    axios.get(`https://mantratravelbackend.onrender.com/api/blogs/${id}`),
-                    axios.get(`https://mantratravelbackend.onrender.com/api/blogs`)
+                    axios.get(`http://localhost:4000/api/blogs/${id}`),
+                    axios.get(`http://localhost:4000/api/blogs`)
                 ]);
                 setBlog(blogRes.data);
 
@@ -170,7 +170,7 @@ const BlogDetail = () => {
                                 <li key={tag}>
                                     <button
                                         className="text-lg text-gray-600 hover:text-black transition-colors font-medium"
-                                        onClick={() => navigate(`/blogs?tag=${tag}`)}
+                                        onClick={() => navigate(`/blog?tag=${tag}`)}
                                     >
                                         {tag}
                                     </button>
@@ -184,7 +184,7 @@ const BlogDetail = () => {
             {/* Back Button Footer */}
             <div className="max-w-7xl mx-auto px-4 py-12 border-t border-gray-100 flex justify-center">
                 <button
-                    onClick={() => navigate("/blogs")}
+                    onClick={() => navigate("/blog")}
                     className="flex items-center gap-3 text-black font-bold uppercase tracking-widest hover:text-[#C4845C] transition-colors group"
                 >
                     <span className="text-xl transition-transform group-hover:-translate-x-2">←</span>

@@ -35,7 +35,7 @@ export default function CountryExplore({ countryName, onBack }) {
     const fetchDestinationData = async () => {
       setLoading(true);
       try {
-        const res = await axios.get(`https://mantratravelbackend.onrender.com/api/blogs?category=Destination&country=${encodeURIComponent(countryName || 'India')}`);
+        const res = await axios.get(`http://localhost:4000/api/blogs?category=Destination&country=${encodeURIComponent(countryName || 'India')}`);
         const blogs = res.data;
 
         // Group blogs by section
@@ -146,7 +146,7 @@ export default function CountryExplore({ countryName, onBack }) {
       </div>
 
       {/* CATEGORY NAV - Glassmorphism style */}
-      <div className="sticky top-4 z-40 mb-12 max-w-6xl mx-auto">
+      {/* <div className="sticky top-4 z-40 mb-12 max-w-6xl mx-auto">
         <div className="flex flex-wrap justify-center gap-3 md:gap-4 p-3 bg-white/70 backdrop-blur-xl rounded-full shadow-xl border border-white/50">
           <button
             onClick={() => setActiveTab("EXPLORER")}
@@ -174,7 +174,7 @@ export default function CountryExplore({ countryName, onBack }) {
             );
           })}
         </div>
-      </div>
+      </div> */}
 
       {/* NAV LINKS - Glassmorphism Tab Bar */}
       {availableTabs.length > 0 && (
@@ -198,52 +198,71 @@ export default function CountryExplore({ countryName, onBack }) {
       )}
 
       {/* GRID - Dynamic Items with Hover Effects */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-8 max-w-7xl mx-auto mb-32">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-10 max-w-7xl mx-auto mb-32 px-4">
         {currentItems.map((item, index) => (
           <div
             key={index}
             onClick={() => handleItemClick(item)}
-            className="group relative flex flex-col rounded-[2rem] overflow-hidden bg-white shadow-md hover:shadow-2xl transition-all duration-500 cursor-pointer hover:-translate-y-2 border border-gray-100"
+            className="group relative flex flex-col rounded-[2.5rem] overflow-hidden bg-white shadow-xl hover:shadow-[0_20px_50px_rgba(0,0,0,0.1)] transition-all duration-700 cursor-pointer hover:-translate-y-3"
           >
-            <div className="aspect-[4/5] overflow-hidden relative">
+            <div className="aspect-[3/4] overflow-hidden relative">
               <img
                 src={item.img}
                 alt={item.title}
                 className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
               />
-              {/* Overlay Gradient */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-60 group-hover:opacity-80 transition-opacity"></div>
+
+              {/* Top Badge - Active Tab tag */}
+              <div className="absolute top-5 left-5 z-10">
+                <span className="px-4 py-1.5 rounded-full bg-white/20 backdrop-blur-md border border-white/30 text-white text-[10px] uppercase font-black tracking-[0.2em]">
+                  {activeTab}
+                </span>
+              </div>
+
+              {/* Dynamic Gradient Overlay */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-80 group-hover:opacity-90 transition-opacity duration-500"></div>
 
               {/* Content on Image */}
-              <div className="absolute bottom-6 left-0 w-full px-4 text-center">
-                <h3 className="text-white font-bold uppercase text-sm md:text-base tracking-[0.2em] drop-shadow-md group-hover:tracking-[0.3em] transition-all">
+              <div className="absolute bottom-8 left-0 w-full px-6 flex flex-col items-center">
+                <div className="w-12 h-[2px] bg-orange-500 mb-4 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-700 origin-center"></div>
+                <h3 className="text-white font-black uppercase text-base md:text-lg tracking-[0.15em] leading-tight drop-shadow-2xl group-hover:text-orange-100 transition-colors duration-300">
                   {item.title}
                 </h3>
+                <p className="text-white/60 text-[10px] mt-2 uppercase tracking-[0.3em] font-bold opacity-0 group-hover:opacity-100 transition-opacity duration-500 translate-y-2 group-hover:translate-y-0 text-center">
+                  DISCOVER MORE
+                </p>
               </div>
             </div>
           </div>
         ))}
 
-        {/* View More Card - Unique Style */}
+        {/* View More Card - Glassmorphism Style */}
         <div
           onClick={() => navigate('/blog')}
-          className="group flex flex-col items-center justify-center rounded-[2rem] overflow-hidden shadow-sm bg-gradient-to-br from-white to-gray-50 p-8 cursor-pointer hover:shadow-xl transition-all duration-500 h-full min-h-[300px] border-2 border-dashed border-gray-200 hover:border-orange-300"
+          className="group relative flex flex-col items-center justify-center rounded-[2.5rem] overflow-hidden transition-all duration-700 h-full min-h-[350px] cursor-pointer bg-slate-50 border-2 border-dashed border-gray-200 hover:border-orange-400 hover:bg-orange-50/30 overflow-hidden"
         >
-          <div className="w-16 h-16 rounded-full bg-orange-100 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-            <svg className="w-8 h-8 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-            </svg>
+          {/* Animated Background Circles */}
+          <div className="absolute -top-10 -right-10 w-32 h-32 bg-orange-100 rounded-full blur-3xl group-hover:bg-orange-200 transition-colors"></div>
+          <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-blue-100 rounded-full blur-3xl group-hover:bg-blue-200 transition-colors"></div>
+
+          <div className="relative z-10 flex flex-col items-center">
+            <div className="w-20 h-20 rounded-full bg-white shadow-lg flex items-center justify-center mb-6 group-hover:rotate-90 transition-transform duration-700">
+              <svg className="w-10 h-10 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <line x1="12" y1="5" x2="12" y2="19" strokeWidth="2.5" strokeLinecap="round" />
+                <line x1="5" y1="12" x2="19" y2="12" strokeWidth="2.5" strokeLinecap="round" />
+              </svg>
+            </div>
+            <div className="text-slate-900 font-extrabold text-2xl tracking-[0.2em] uppercase text-center">
+              View All<br /><span className="text-orange-600">Stories</span>
+            </div>
+            <div className="w-8 h-1 bg-slate-200 mt-4 group-hover:w-16 group-hover:bg-orange-300 transition-all duration-500"></div>
           </div>
-          <div className="text-slate-900 font-extrabold text-xl tracking-widest uppercase">
-            View More
-          </div>
-          <p className="text-gray-400 text-xs mt-2 uppercase tracking-tighter">Explore all stories</p>
         </div>
       </div>
 
       {/* HERO PROMOTIONAL SECTIONS */}
       <div className="w-full space-y-24">
-        <section className="p-0 text-center rounded-[3rem] overflow-hidden shadow-2xl mx-4">
+        <section className="p-0 text-center rounded-[3rem] overflow-hidden  mx-4">
           <div className="flex flex-col h-auto md:min-h-[1200px]">
             {/* Top Half */}
             <div

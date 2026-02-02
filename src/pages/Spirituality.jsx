@@ -13,7 +13,7 @@ export default function Spirituality() {
     useEffect(() => {
         const fetchBlogs = async () => {
             try {
-                const res = await axios.get('https://mantratravelbackend.onrender.com/api/blogs?tag=spirituality');
+                const res = await axios.get('http://localhost:4000/api/blogs?tag=spirituality');
                 setBlogs(res.data);
             } catch (err) {
                 console.error("Error fetching nature blogs", err);
@@ -27,7 +27,7 @@ export default function Spirituality() {
     useEffect(() => {
         const fetchExploreBlogs = async () => {
             try {
-                const res = await axios.get('https://mantratravelbackend.onrender.com/api/blogs?tag=explorespirituality');
+                const res = await axios.get('http://localhost:4000/api/blogs?tag=explorespirituality');
                 setExploreBlog(res.data);
             } catch (err) {
                 console.error("Error fetching nature blogs", err);

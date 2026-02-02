@@ -14,7 +14,7 @@ const SEOManagement = () => {
     useEffect(() => {
         const fetchSEO = async () => {
             try {
-                const res = await axios.get("https://mantratravelbackend.onrender.com/api/seo");
+                const res = await axios.get("http://localhost:4000/api/seo");
                 if (res.data) {
                     setFormData({
                         title: res.data.title || "",
@@ -40,7 +40,7 @@ const SEOManagement = () => {
         setSaving(true);
         try {
             const token = localStorage.getItem("token");
-            await axios.put("https://mantratravelbackend.onrender.com/api/seo", formData, {
+            await axios.put("http://localhost:4000/api/seo", formData, {
                 headers: { "x-auth-token": token }
             });
             Swal.fire({
