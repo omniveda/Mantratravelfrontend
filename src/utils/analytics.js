@@ -2,7 +2,7 @@ import ReactGA from "react-ga4";
 import axios from "axios";
 
 const TRACKING_ID = "G-XXXXXXXXXX"; // User should replace this in .env later
-const API_URL = "http://localhost:4000/api/analytics";
+const API_URL = "https://mantratravelbackend.onrender.com/api/analytics";
 
 // Simple persistent visitor ID
 const getVisitorId = () => {

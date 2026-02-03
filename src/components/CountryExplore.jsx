@@ -35,7 +35,7 @@ export default function CountryExplore({ countryName, onBack }) {
     const fetchDestinationData = async () => {
       setLoading(true);
       try {
-        const res = await axios.get(`http://localhost:4000/api/blogs?category=Destination&country=${encodeURIComponent(countryName || 'India')}`);
+        const res = await axios.get(`https://mantratravelbackend.onrender.com/api/blogs?category=Destination&country=${encodeURIComponent(countryName || 'India')}`);
         const blogs = res.data;
 
         // Group blogs by section

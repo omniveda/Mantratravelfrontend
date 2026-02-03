@@ -22,7 +22,7 @@ const AnalyticsDashboard = () => {
     const fetchStats = async () => {
         try {
             const token = localStorage.getItem("token");
-            const res = await axios.get("http://localhost:4000/api/analytics/stats", {
+            const res = await axios.get("https://mantratravelbackend.onrender.com/api/analytics/stats", {
                 headers: { "x-auth-token": token }
             });
             setStats(res.data);

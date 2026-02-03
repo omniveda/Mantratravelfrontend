@@ -1,35 +1,19 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import Les_wond1 from "../assets/Home_page/Les_wond1.png";
-import Les_wond2 from "../assets/Home_page/Les_wond2.png";
-import Les_wond3 from "../assets/Home_page/Les_wond3.png";
 import down_mountain from "../assets/Home_page/down_mountain.png";
 
-const destinations = [
-  {
-    img: Les_wond1,
-    title: "Kedarnath",
-  },
-  {
-    img: Les_wond2,
-    title: "Shiva",
-  },
-  {
-    img: Les_wond3,
-    title: "Ellora",
-  },
-];
 
-export default function Destination() {
+
+export default function Destination({ country }) {
   const navigate = useNavigate();
   const [current, setCurrent] = useState(0);
-  const [dynamicDestinations, setDynamicDestinations] = useState(destinations);
+  const [dynamicDestinations, setDynamicDestinations] = useState([]);
 
   useEffect(() => {
     const fetchWonders = async () => {
       try {
-        const res = await axios.get('http://localhost:4000/api/blogs?tag=wonders');
+        const res = await axios.get(`https://mantratravelbackend.onrender.com/api/blogs/tags?tags=wonders,${encodeURIComponent(country)}`);
         if (res.data && res.data.length > 0) {
           setDynamicDestinations(res.data.map(blog => ({
             img: blog.image,
@@ -53,6 +37,14 @@ export default function Destination() {
   const next = () => {
     setCurrent((prev) => (prev + 1) % dynamicDestinations.length);
   };
+
+  if (dynamicDestinations.length === 0) {
+    return (
+      <div className="py-20 text-center">
+        <p className="text-gray-500">Loading destinations...</p>
+      </div>
+    );
+  }
 
   const left = dynamicDestinations[(current - 1 + dynamicDestinations.length) % dynamicDestinations.length];
   const center = dynamicDestinations[current];

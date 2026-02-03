@@ -22,7 +22,7 @@ const ShopManagement = () => {
     const fetchProducts = async () => {
         setFetching(true);
         try {
-            const response = await axios.get("http://localhost:4000/api/products");
+            const response = await axios.get("https://mantratravelbackend.onrender.com/api/products");
             // Ensure we always set an array, even if API returns different format
             const productsData = response.data;
             if (Array.isArray(productsData)) {
@@ -66,7 +66,7 @@ const ShopManagement = () => {
 
         try {
             if (editId) {
-                await axios.put(`http://localhost:4000/api/products/${editId}`, data, {
+                await axios.put(`https://mantratravelbackend.onrender.com/api/products/${editId}`, data, {
                     headers: {
                         "Content-Type": "multipart/form-data",
                         "x-auth-token": token,
@@ -75,7 +75,7 @@ const ShopManagement = () => {
                 alert("Product updated successfully!");
                 setEditId(null);
             } else {
-                await axios.post("http://localhost:4000/api/products", data, {
+                await axios.post("https://mantratravelbackend.onrender.com/api/products", data, {
                     headers: {
                         "Content-Type": "multipart/form-data",
                         "x-auth-token": token,
@@ -113,7 +113,7 @@ const ShopManagement = () => {
         if (!window.confirm("Are you sure you want to delete this product?")) return;
 
         try {
-            await axios.delete(`http://localhost:4000/api/products/${id}`, {
+            await axios.delete(`https://mantratravelbackend.onrender.com/api/products/${id}`, {
                 headers: { "x-auth-token": token },
             });
             fetchProducts();

@@ -12,7 +12,7 @@ const SEOHelmet = () => {
     useEffect(() => {
         const fetchSEO = async () => {
             try {
-                const res = await axios.get("http://localhost:4000/api/seo");
+                const res = await axios.get("https://mantratravelbackend.onrender.com/api/seo");
                 if (res.data) {
                     setSeo(res.data);
                 }

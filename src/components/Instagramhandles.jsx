@@ -31,7 +31,7 @@ export default function Instagramhandles({ countryName }) {
                 const countryParam = countryName ? `?country=${encodeURIComponent(countryName)}&fallback=General` : "?country=India&fallback=General";
 
                 // Fetch from specific instagram API
-                const res = await axios.get(`http://localhost:4000/api/instagram${countryParam}`);
+                const res = await axios.get(`https://mantratravelbackend.onrender.com/api/instagram${countryParam}`);
                 const data = res.data;
 
                 if (data && data.length > 0) {
@@ -53,7 +53,7 @@ export default function Instagramhandles({ countryName }) {
                 }
 
                 // Fetch regional instagram accounts (States) from the new tags API
-                const statesRes = await axios.get(`http://localhost:4000/api/instagram/tags?tags=${encodeURIComponent(countryName || 'India')}`);
+                const statesRes = await axios.get(`https://mantratravelbackend.onrender.com/api/instagram/tags?tags=${encodeURIComponent(countryName || 'India')}`);
                 const mappedStates = statesRes.data.map(item => ({
                     title: item.name,
                     img: item.image,
@@ -64,7 +64,7 @@ export default function Instagramhandles({ countryName }) {
                     setStates(mappedStates);
                 } else {
                     // Fallback: Fetch all instagram accounts if no regional ones found
-                    const allRes = await axios.get(`http://localhost:4000/api/instagram${countryParam}`);
+                    const allRes = await axios.get(`https://mantratravelbackend.onrender.com/api/instagram${countryParam}`);
                     const allMapped = allRes.data.map(item => ({
                         title: item.name,
                         img: item.image,

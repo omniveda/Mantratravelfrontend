@@ -27,7 +27,7 @@ const BlogManagement = () => {
     const fetchBlogs = async () => {
         setFetching(true);
         try {
-            let url = "http://localhost:4000/api/blogs";
+            let url = "https://mantratravelbackend.onrender.com/api/blogs";
             const params = new URLSearchParams();
             if (filterCategory) params.append("category", filterCategory);
             if (filterCountry) params.append("country", filterCountry);
@@ -151,9 +151,9 @@ const BlogManagement = () => {
             };
 
             if (isEditing) {
-                await axios.put(`http://localhost:4000/api/blogs/${currentBlogId}`, data, config);
+                await axios.put(`https://mantratravelbackend.onrender.com/api/blogs/${currentBlogId}`, data, config);
             } else {
-                await axios.post("http://localhost:4000/api/blogs", data, config);
+                await axios.post("https://mantratravelbackend.onrender.com/api/blogs", data, config);
             }
 
             resetForm();
@@ -171,7 +171,7 @@ const BlogManagement = () => {
         if (!window.confirm("Are you sure?")) return;
         try {
             const token = localStorage.getItem("token");
-            await axios.delete(`http://localhost:4000/api/blogs/${id}`, {
+            await axios.delete(`https://mantratravelbackend.onrender.com/api/blogs/${id}`, {
                 headers: { "x-auth-token": token },
             });
             fetchBlogs();

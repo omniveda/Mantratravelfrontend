@@ -31,7 +31,7 @@ export default function Holiday2() {
         const fetchBlogs = async () => {
             try {
                 // Fetch Plan Your Trip blogs
-                const planTripRes = await axios.get('http://localhost:4000/api/blogs?tag=plantrip');
+                const planTripRes = await axios.get('https://mantratravelbackend.onrender.com/api/blogs?tag=plantrip');
                 if (planTripRes.data && planTripRes.data.length > 0) {
                     setPlanTripBlogs(planTripRes.data.map(blog => ({
                         img: blog.image,
@@ -43,7 +43,7 @@ export default function Holiday2() {
                 }
 
                 // Fetch Art & Culture blogs
-                const artCultureRes = await axios.get('http://localhost:4000/api/blogs?tag=artculture');
+                const artCultureRes = await axios.get('https://mantratravelbackend.onrender.com/api/blogs?tag=artculture');
                 if (artCultureRes.data && artCultureRes.data.length > 0) {
                     setArtCultureBlogs(artCultureRes.data.map(blog => ({
                         img: blog.image,

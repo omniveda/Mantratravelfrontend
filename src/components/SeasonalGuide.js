@@ -68,7 +68,7 @@ export default function SeasonalGuide({ country = "india" }) {
         const fallbackParam = "&fallback=General";
 
         // Fetch destination picks
-        const destRes = await axios.get(`http://localhost:4000/api/blogs/tags?tags=destinations,${encodeURIComponent(country)}`);
+        const destRes = await axios.get(`https://mantratravelbackend.onrender.com/api/blogs/tags?tags=destinations,${encodeURIComponent(country)}`);
         console.log(destRes.data);
         if (destRes.data && destRes.data.length > 0) {
           setDynamicPicks(destRes.data.map(blog => ({
@@ -79,7 +79,7 @@ export default function SeasonalGuide({ country = "india" }) {
         }
 
         // Fetch history & heritage blogs
-        const historyRes = await axios.get(`http://localhost:4000/api/blogs/tags?tags=historyheritage,${encodeURIComponent(country)}`);
+        const historyRes = await axios.get(`https://mantratravelbackend.onrender.com/api/blogs/tags?tags=historyheritage,${encodeURIComponent(country)}`);
         if (historyRes.data && historyRes.data.length > 0) {
           setHistoryBlogs(historyRes.data.map(blog => ({
             title: blog.heading,
@@ -89,7 +89,7 @@ export default function SeasonalGuide({ country = "india" }) {
         }
 
         // Fetch animal blogs
-        const animalRes = await axios.get(`http://localhost:4000/api/blogs/tags?tags=animals,${encodeURIComponent(country)}`);
+        const animalRes = await axios.get(`https://mantratravelbackend.onrender.com/api/blogs/tags?tags=animals,${encodeURIComponent(country)}`);
         if (animalRes.data && animalRes.data.length > 0) {
           setAnimalBlogs(animalRes.data.map(blog => ({
             title: blog.heading,
@@ -99,7 +99,7 @@ export default function SeasonalGuide({ country = "india" }) {
         }
 
         // Fetch tapestry blog
-        const tapestryRes = await axios.get(`http://localhost:4000/api/blogs/tags?tags=tapestry,${encodeURIComponent(country)}`);
+        const tapestryRes = await axios.get(`https://mantratravelbackend.onrender.com/api/blogs/tags?tags=tapestry,${encodeURIComponent(country)}`);
         if (tapestryRes.data && tapestryRes.data.length > 0) {
           setTapestryBlog({
             title: tapestryRes.data[0].heading,

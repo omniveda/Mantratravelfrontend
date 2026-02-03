@@ -43,7 +43,7 @@ export default function IndiaCorner() {
     const fetchIndiaData = async () => {
       setLoading(true);
       try {
-        const res = await axios.get(`http://localhost:4000/api/blogs?category=Destination&country=India`);
+        const res = await axios.get(`https://mantratravelbackend.onrender.com/api/blogs?category=Destination&country=India`);
         const blogs = res.data;
 
         // Group blogs by section
@@ -191,7 +191,7 @@ export default function IndiaCorner() {
         ))}
       </div>
 
-      <section className="p-0 text-center rounded-[3rem] overflow-hidden shadow-2xl">
+      <section className="p-0 text-center rounded-t-[3rem] mb-10 overflow-hidden">
         <div className="flex flex-col h-auto md:min-h-[1200px]">
           {/* Top Half */}
           <div
@@ -331,7 +331,7 @@ export default function IndiaCorner() {
         </div>
 
         <div className="bg-white rounded-[4rem] py-20 px-4 shadow-sm border border-gray-100">
-          <Destination />
+          <Destination country="india" />
         </div>
 
         <div className="space-y-40">
@@ -343,8 +343,8 @@ export default function IndiaCorner() {
         </div>
 
         <div>
-          <div className="bg-slate-900 rounded-[3rem] p-1 shadow-2xl overflow-hidden">
-            <div className="bg-white/5 backdrop-blur-md rounded-[2.8rem] py-12">
+          <div className="shadow-2xl">
+            <div className="bg-white/5  backdrop-blur-md rounded-[2.8rem] py-4">
               <TravelBook />
             </div>
           </div>
